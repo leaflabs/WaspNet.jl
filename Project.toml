@@ -1,0 +1,4 @@
+name = "nnsim"
+uuid = "2a7ddd44-2043-11ea-1b23-d1c817c05b75"
+authors = ["Sam Buercklin <buercklin@leaflabs.com>"]
+version = "0.1.0"
