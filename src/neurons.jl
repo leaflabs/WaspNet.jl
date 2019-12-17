@@ -1,27 +1,25 @@
 # LIF Neuron
-@with_kw mutable struct LIF{F}<:AbstractNeuron
-    τ::F = 5.         # Time Constant (ms)
-    R::F = 10.E3      # "Resistor" (kOhms)
+@with_kw struct LIF{F}<:AbstractNeuron
+    τ::F = 8.         # Time Constant (ms)
+    R::F = 10.E6      # "Resistor" (kOhms)
     θ::F = 30.      # Threshold voltage (mV)
-    v0::F = -55.     # Reset voltage (mV)
     I::F = 40.      # Background current injection (mA)
-    v::F = -55.     # Membrane potential (mV)
+
+    v0::Array{F,1} = [-55.]     # Reset voltage (mV)
+    state::Array{F,1} = [-55.]     # Membrane potential (mV)
 end
 
 function update!(neuron::LIF, input_update, dt, t) 
     retval = 0
     # If an impulse came in, add it
-    neuron.v += input_update
+    neuron.state .+= input_update
 
-    # Euler method updates to potential in 2 steps for numerical stability
-    println("pre:", neuron.v)
-    neuron.v += (dt/2 * 1/neuron.τ) * (-neuron.v + neuron.R*neuron.I)
-    neuron.v += (dt/2 * 1/neuron.τ) * (-neuron.v + neuron.R*neuron.I)
-    println("post:", neuron.v)
+    # Euler method update
+    neuron.state .+= (dt/neuron.τ) * (-neuron.state[1] + neuron.R*neuron.I)
 
     # Check for thresholding
-    if neuron.v >= neuron.θ
-        neuron.v = neuron.v0
+    if neuron.state[1] >= neuron.θ
+        neuron.state .= neuron.v0
         retval = 1 # Binary output
     end
 
@@ -29,44 +27,44 @@ function update!(neuron::LIF, input_update, dt, t)
 end
 
 function reset!(neuron::LIF)
-    neuron.v = neuron.v0
+    neuron.state .= neuron.v0
 end
 
-# QIF Neuron
-# @with_kw struct QIF<:AbstractNeuron
-#     c
-# end
 
 # Izhikevich Neuron
 @with_kw struct Izh{F}<:AbstractNeuron
-   a::F = 0.02  
+   a::F = 0.02      # a-d are model parameters
    b::F = 0.2
    c::F = -65.
    d::F = 8.
    I::F = 25.       # Background current injection (mA)
-   v0::F = -65.     # Reset voltage (mV)
    θ::F = 30.       # Threshold potential (mV)
 
-   v::F = -65.      # Membrane potential (mV)
-   u::F = 0.        # Recovery variable
+   v0::F = -65.     # Reset voltage (mV)
+   u0::F = 0.       # Reset state variable
+   state::Array{F,1} = [-65., 0.]      # Membrane potential (mV) and state variable
 end
 
 function update!(neuron::Izh, input_update, dt, t)
     retval = 0
+    # If an impulse came in, add it
+    neuron.state .+= input_update
 
-    # Euler method updates to potential in 2 steps for numerical stability
-    neuron.v += (dt/2)*(0.05 * neuronv.v^2 + 5*neuron.v + 140 - neuron.u + neuron.I)
-    neuron.u += (dt/2)*(neuron.a)*(neuron.b*neuron.v-neuron.u)
-
-    neuron.v += (dt/2)*(0.05 * neuronv.v^2 + 5*neuron.v + 140 - neuron.u + neuron.I)
-    neuron.u += (dt/2)*(neuron.a)*(neuron.b*neuron.v-neuron.u)
+    # Euler method update
+    neuron.state .+= [
+        dt*(0.05 * neuron.state[1]^2 + 5*neuron.state[1] + 140 - neuron.state[2] + neuron.I),
+        dt*(neuron.a)*(neuron.b*neuron.state[1]-neuron.state[2])
+        ]
 
     # Check for thresholding
-    if neuron.v >= neuron.θ
-        neuron.v = neuron.v0
-        neuron.u += d
+    if neuron.state[1] >= neuron.θ
+        neuron.state .= [ neuron.v0, neuron.state[2] + neuron.d]
         retval = 1
     end
 
     return retval
+end
+
+function reset!(neuron::Izh)
+    neuron.state .= [neuron.v0, neuron.u0]
 end
