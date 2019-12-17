@@ -1,5 +1,10 @@
 module nnsim
 
-greet() = print("Hello World!")
+using Parameters
+
+include("types.jl")
+include("neurons.jl")
+
+export AbstractNetwork, AbstractNeuron, Layer
 
 end # module

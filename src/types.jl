@@ -1,6 +1,7 @@
-abstract type Neuron
+abstract type AbstractNetwork end
 
-struct Layer{T}
-    neurons::T
-    W
+abstract type AbstractNeuron <: AbstractNetwork end
+
+struct Layer{T}<:AbstractNetwork
+
 end
