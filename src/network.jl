@@ -25,5 +25,6 @@ end
 
 function reset!(network::Network)
     reset!.(network.layers)
-    network.state =
+    network.state = zeros(N_neurons, 1)
+    return nothing
 end
