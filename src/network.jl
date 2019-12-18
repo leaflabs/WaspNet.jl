@@ -10,7 +10,7 @@ end
 function Network(layers::Array{<:AbstractLayer, 1}, track_flag = false)
     N_in = size(layers[1].W)[2] # Number of dimensions in the input space
     N_out = size(layers[end].W)[1] # Number of output dimensions
-    N_neurons = mapreduce(l -> l.N_neurons, sum, layers)
+    N_neurons = sum(map(l -> l.N_neurons, layers))
 
     return Network(layers, N_in, N_out, zeros(N_neurons, 1), 0.0, track_flag)
 end
