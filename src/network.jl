@@ -7,7 +7,7 @@ mutable struct Network<:AbstractNetwork
     track_flag::Bool                   # Flag to track the states of all neurons
 end
 
-function Network(layers::Array{<:AbstractLayer, 1}, track_flag = False)
+function Network(layers::Array{<:AbstractLayer, 1}, track_flag = false)
     N_in = size(layers[1].W)[2] # Number of dimensions in the input space
     N_out = size(layers[end].W)[1] # Number of output dimensions
     N_neurons = mapreduce(l -> l.N_neurons, sum, layers)
