@@ -6,8 +6,10 @@ using Parameters
 include("types.jl")
 include("neurons.jl")
 include("layer.jl")
+include("network.jl")
 
-export AbstractNetwork, AbstractNeuron, Layer
-export update!
+export NetworkElement, AbstractNetwork, AbstractNeuron, AbstractLayer
+export Layer, Network
+export update!, reset!
 
 end # module

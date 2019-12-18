@@ -1,5 +1,5 @@
-# Layer, a collection of neurons being driven by the same input vector
-struct Layer{L<:AbstractNeuron}<:AbstractNetwork
+# Layer, a collection of neurons of the same type being driven by some input vector
+struct Layer{L<:AbstractNeuron}<:AbstractLayer
     neurons::Array{L,1}
     W # TODO: Make type union with sparse matrices
     N_neurons
