@@ -17,3 +17,7 @@ end
 function reset!(l::Layer)
     reset!.(l.neurons)
 end
+
+function get_neuron_states(l::Layer)
+    return vcat([n.state for n in l.neurons]...)
+end
