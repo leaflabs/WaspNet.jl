@@ -4,7 +4,7 @@
 # This function enables us to abstract away creation of a layer to specifying element-wise
 #   parameters and the layer parameters itself (W, number of neurons). We cannot broadcast
 #   over keyword arguments, so we have to write another function to handle the broadcasting.
-function Batch_Layer_Construction(n_constr, W, N_neurons; kwargs...)
+function batch_layer_construction(n_constr, W, N_neurons; kwargs...)
     # Order the kwargs to pass to the constructor
     arg_keys = keys(kwargs)
     ordered_args = [kwargs[k] for k in arg_keys]

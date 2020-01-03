@@ -1,4 +1,5 @@
-
+# For overloading purposes
+function update! end
 
 # LIF Neuron
 @with_kw struct LIF{F}<:AbstractNeuron
@@ -50,7 +51,7 @@ end
 function update!(neuron::Izh, input_update, dt, t)
     retval = 0
     # If an impulse came in, add it
-    neuron.state .+= input_update
+    neuron.state[1] .+= input_update
 
     # Euler method update
     neuron.state .+= [
