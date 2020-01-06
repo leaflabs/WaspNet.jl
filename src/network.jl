@@ -1,23 +1,29 @@
+
+# A Network comprises layers and handles passing inputs between layers. Furthemore,
+#   it also tracks the states of all of the neurons at each time step. 
 mutable struct Network<:AbstractNetwork
     layers::Array{<:AbstractLayer, 1}  # Array of layers in order from input to output
     N_in::Int                          # Number of input dimensions
     N_out::Int                         # Number of output dimensions
-    neur_states::Matrix                # The outputs of each neuron for each time step
+    neur_states::Matrix                # The states of each neuron for each time step
     state_size::Int
     t                                  # Internal time parameter
-    track_flag::Bool                   # Flag to track the states of all neurons
 end
 
-function Network(layers::Array{<:AbstractLayer, 1}, track_flag = false)
+# Constructor for the Network which simply takes as input the layers in order from 
+#   first to last.
+function Network(layers::Array{<:AbstractLayer, 1})
     N_in = size(layers[1].W)[2] # Number of dimensions in the input space
     N_out = size(layers[end].W)[1] # Number of output dimensions
     N_neurons = sum(map(l -> l.N_neurons, layers))
 
     state_size = sum([length(l.neurons[1].state)*length(l.neurons) for l in layers])
 
-    return Network(layers, N_in, N_out, zeros(state_size, 1), state_size, 0.0, track_flag)
+    return Network(layers, N_in, N_out, zeros(state_size, 1), state_size, 0.0)
 end
 
+# Evolve the entire Network a duration `dt` starting from time `t` according to the
+#   input `input`
 function update!(network::Network, input, dt, t)
     in_vec = input
     out_vec = foldl(
@@ -26,28 +32,36 @@ function update!(network::Network, input, dt, t)
     return out_vec
 end
 
+# Reset the Network to its initial state.
 function reset!(network::Network)
-    network_neur_states = Array{Any, 2}(undef, network.state_size, 1) #zeros(get_neuron_count(network), N_steps)
+    network_neur_states = Array{Any, 2}(undef, network.state_size, 1) 
+    network.t = 0.
     reset!.(network.layers)
     return nothing
 end
 
-function simulate!(network::Network, input, dt, t_total)
-    t_steps = 0:dt:t_total
+# Simulate the network from `t0` to `tf` with a time step of `dt` with an input to
+#   the first layer of `input`
+function simulate!(network::Network, input, dt, tf, t0 = 0, track_flag = false)
+    t_steps = t0:dt:tf
     N_steps = length(t_steps)
-    network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps)) #zeros(get_neuron_count(network), N_steps)
+    network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps)) 
     for (i,t) in zip(1:N_steps,t_steps)
         update!(network, input, dt, t)
-        network.neur_states[:,i] = get_neuron_states(network)
+        network.neur_states[:,i] .= get_neuron_states(network)
+        network.t += dt
     end
+
     return network.neur_states
 end
 
-
+# Count the number of neurons in the `Network`.
 function get_neuron_count(network::Network)
     return sum(map((x)->x.N_neurons, network.layers))
 end
 
+# Get the state of each `Neuron` in the `Network` in a single array at the
+#   current internal time step.
 function get_neuron_states(network::Network)
     return vcat([get_neuron_states(l) for l in network.layers]...)
 end

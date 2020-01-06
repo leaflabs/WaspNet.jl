@@ -12,6 +12,8 @@ function update! end
     state::Array{F,1} = [-55.]     # Membrane potential (mV)
 end
 
+
+# LIF time evolution step, using Euler method to ensure uniform time steps
 function update!(neuron::LIF, input_update, dt, t) 
     retval = 0
     # If an impulse came in, add it
@@ -34,7 +36,7 @@ function reset!(neuron::LIF)
 end
 
 
-# Izhikevich Neuron
+# Izhikevich Neuron, using Euler method to ensure uniform time step
 @with_kw struct Izh{F}<:AbstractNeuron
    a::F = 0.02      # a-d are model parameters
    b::F = 0.2
