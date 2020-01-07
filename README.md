@@ -1,5 +1,5 @@
 # nnsim
-`nnsim` is a Julia package meant for fixed-time-step simulations of both artificial and spiking neural networks (ANNs and SNNs). 
+`nnsim` is a Julia package for fixed-time-step simulations of both artificial and spiking neural networks (ANNs and SNNs). 
 
 This package is meant primarily for exploring SNN or hybrid architectures and experimenting with new neuron models. `Network` and `Layer` abstractions are provided, and an `AbstractNeuron` type is defined for users to construct their own neuron models. Utilizing multiple dispatch ensures that new neuron types slot easily into the existing framework.
 
