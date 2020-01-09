@@ -19,5 +19,5 @@ function batch_layer_construction(n_constr, W, N_neurons; kwargs...)
     #   vector so that we always return the correct number of neurons.
     neurons = bcast_function.(zeros(N_neurons), ordered_args...)
 
-    return Layer(neurons, W, N_neurons)
+    return Layer(neurons, zeros(N_neurons), W, N_neurons)
 end

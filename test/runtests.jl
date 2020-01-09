@@ -22,7 +22,7 @@ using nnsim, Test
         W[1,1] = 1.
         W[2,2] = 1.
 
-        L = Layer([lif1, lif2], W, 2)
+        L = Layer([lif1, lif2], zeros(2), W, 2)
 
         update!(L, [0., 0.], 0.001, 0.)
         @test lif1.state[1] == lif2.state[1]
@@ -39,7 +39,7 @@ using nnsim, Test
     end
 
     @testset "Networks" begin
-    
+
         
     end
 
