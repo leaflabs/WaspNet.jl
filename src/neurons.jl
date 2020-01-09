@@ -53,7 +53,7 @@ end
 function update!(neuron::Izh, input_update, dt, t)
     retval = 0
     # If an impulse came in, add it
-    neuron.state[1] .+= input_update
+    neuron.state[1] += input_update
 
     # Euler method update
     neuron.state .+= [
