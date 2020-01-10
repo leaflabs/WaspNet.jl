@@ -60,16 +60,15 @@ function simulate!(network::Network, input, dt, tf, t0 = 0; track_flag = false)
 
     network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), length(t_steps))
     if track_flag
-        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps) + 1) 
+        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps)) 
         network.neur_states[:,1] .= get_neuron_states(network)
     end
 
     for (i,t) in zip(1:N_steps,t_steps)
         update!(network, input, dt, t)
         network.neur_outputs[:, i] = get_neuron_outputs(network)
-        # network.neur_outputs[:, i] .= neurons_out
         if track_flag
-            network.neur_states[:,i+1] .= get_neuron_states(network)
+            network.neur_states[:,i] .= get_neuron_states(network)
         end
         network.t += dt
     end

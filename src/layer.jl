@@ -9,7 +9,7 @@ end
 # Evolve all of the neurons in the layer a duration `dt` starting at the time `t`
 #   subject to an input from the previous layer `input`.
 function update!(l::Layer, input, dt, t)
-    if any(input != 0)
+    if any(input .!= 0)
         l.output .= update!.(l.neurons, l.W*input, dt, t)
     else
         l.output .= update!.(l.neurons, 0, dt, t)
