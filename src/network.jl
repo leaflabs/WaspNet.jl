@@ -46,7 +46,8 @@ end
 
 # Reset the Network to its initial state.
 function reset!(network::Network)
-    network_neur_states = Array{Any, 2}(undef, network.state_size, 1) 
+    network.neur_states = Array{Any, 2}(undef, network.state_size, 0)
+    network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), 0)
     network.t = 0.
     reset!.(network.layers)
     return nothing
