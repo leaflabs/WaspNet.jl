@@ -6,11 +6,10 @@ using nnsim
 
 # %%
 #= 
-
 Let's see what sort of firing rates we can expect from a standard Izh neuron 
 subject to a variety of input spike amplitudes and frequencies
-
 =#
+
 # %%
 # Simulate a neuron that has a spike input every quiet_length+1 steps
 #   and return the output spike train
@@ -36,7 +35,7 @@ end
 # Let's sweep over the amplitude and check the spiking frequency with a spike coming in every 30 ms
 izh_neuron = nnsim.Izh()
 
-quiet_lengths = [9, 14, 19, 24, 29, 34, 39, 44, 49] # spike every 29+1 ms
+quiet_lengths = [99, 149, 199, 249, 299, 349, 399, 449, 499] # spike every 29+1 ms
 Tsim = 5. # seconds
 dt = 0.0001
 
@@ -56,9 +55,9 @@ plt.plot(amps, hcat(fire_freq...))
 plt.xlabel("Incoming Amplitude (mV)")
 plt.ylabel("Spiking Frequency (Hz)")
 plt.title("Spiking Frequency at various Amplitudes, Incoming Spike Periods")
-plt.legend(["$x ms" for x in (quiet_lengths.+1)])
+plt.legend(["$(x/10) ms" for x in (quiet_lengths.+1)])
 
-.savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs.png");
+savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs.png");
 # %%
 # %%
 # %%
