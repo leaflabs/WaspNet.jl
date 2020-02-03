@@ -1,13 +1,14 @@
 # %%
 using PyPlot
 using Statistics 
+using Distributions # Used to generate 
 
 using nnsim
 
 # %%
-#=
-    Generate a length of zeros punctuated by a spike
-=#
+#================================================================================
+    Generate an array of zeros punctuated by a spike
+================================================================================= =#
 # %%
 function generate_spike_train(amplitude, quiet_length, dt = 0.001)
     quiet_steps = floor(Int, quiet_length/dt) - 1
@@ -15,10 +16,71 @@ function generate_spike_train(amplitude, quiet_length, dt = 0.001)
 end
 
 # %%
-#= 
+#================================================================================
+    Given a binary matrix representing spike events for each neuron,
+    compute statistics for the spike trains. Assumes a rectangular (uniform)
+    shape for the network    
+================================================================================= =#
+# %%
+function analyze_spike_matrix(spike_mat, layers, dt = 0.001)
+    n_neur = size(spike_mat, 1)
+    width = n_neur ÷ layers
+
+    stats = Dict{Any,Any}("network" => _analyze_spike_set(spike_mat, dt))
+
+    for l in 1:layers
+        neuron_idxs = (l-1)*width .+ (1:width)
+        stats[l] = _analyze_spike_set(spike_mat[neuron_idxs, :], dt)
+        for n in 1:width
+            stats[(l,n)] = _analyze_spike_set(spike_mat[(l-1)*width+n, :], dt)
+        end
+    end
+    return stats
+end
+
+# ber = Bernoulli(0.05)
+# data = rand(ber, 32, 5001)
+# a_dict = analyze_spike_matrix(data, 4)
+
+# println("Network: ", a_dict["network"])
+# println()
+# for j in 1:4
+#     println("Layer $(j): ", a_dict[j])
+#     for k in 1:8
+#         println("Neuron ($(j),$(k)): ", a_dict[(j,k)])
+#     end
+#     println()
+# end
+
+# %%
+function _analyze_spike_set(spikes, dt = 0.001)
+    if ndims(spikes) == 1
+        spikes = reshape(spikes, 1, length(spikes))
+    end
+    freqs = mean(spikes, dims = 2)/dt
+    _mean = mean(freqs)
+    _median = median(freqs)
+    _max = maximum(freqs)
+    _min = minimum(freqs)
+    return (_mean, _median, _min, _max)
+end
+
+ber = Bernoulli(0.2)
+data = rand(ber, 5, 1000)
+println(_analyze_spike_set(data))
+for j in 1:5
+    println(_analyze_spike_set(data[j,:]))
+end
+
+# %%
+#================================================================================
+
+
 Let's see what sort of firing rates we can expect from a standard Izh neuron 
 subject to a variety of input spike amplitudes and frequencies
-=#
+
+
+================================================================================= =#
 
 # %%
 # Simulate a neuron that has a spike input every quiet_length+1 steps
@@ -70,11 +132,15 @@ plt.legend(["$(round(Int, x*1000)) ms" for x in (quiet_lengths)])
 savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs.png");
 
 # %%
-#= 
+#================================================================================
+
+
 Let's look at how firing rates scale as a function of number of neurons
 in a linear chain. We'll only have a single neuron in each layer and examine
 the spiking rate the the output layer. 
-=#
+
+
+================================================================================= =#
 
 # %%
 function test_network!(network, quiet_length, Tsim, dt = 0.001)
@@ -130,10 +196,91 @@ plt.legend(["Layer $(x)" for x in 1:max_layers])
 savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs_by_layer_single_chain.png");
 
 # %%
+#================================================================================
+
+
+Now we'll consider the spiking rates of a network with some width subject to a 
+single neuron at the input layer being driven by a constant amplitude with
+random (dense) connections between layers.
+
+
+================================================================================= =#
+
 # %%
+# Unlike before, we're driving the input layer with a constant amplitude,
+#   not a periodic amplitude, 
+function test_wide_network!(network, quiet_length, Tsim, l_width, dt = 0.001)
+    reset!(network)
+    
+    sim_times = 0.:dt:Tsim
+    sim_length = length(sim_times)
+
+    # Note that we set the amplitude to 1 here b/c the weights handle the amplitude
+    zeros_and_spike = generate_spike_train(1, quiet_length, dt)
+    spike_length = length(zeros_and_spike)
+
+    output = [] 
+    for (i,t) in enumerate(sim_times)
+        inval = zeros_and_spike[(i-1) % spike_length + 1]
+        update!(network, vcat(inval, zeros(l_width-1)), dt, t)
+        all_out = nnsim.get_neuron_outputs(network)
+        push!(output, all_out)
+    end
+
+    return hcat(output...)   
+end
+
 # %%
+function construct_wide_network(N_layers, width, distr, neuron = nnsim.Izh)
+    W1 = zeros(width, width)
+    W1[1,1] = mean(distr)
+    layers = [batch_layer_construction(neuron, W1, width)]
+    for j in 1:(N_layers-1)
+        push!(layers, batch_layer_construction(neuron, rand(distr, width, width), width))
+    end
+    return Network(layers)
+end
+
 # %%
+N_layers = 7
+width = 32 
+
+Tsim = 5. # seconds
+quiet_length = 0.01
+dt = 0.001
+
+amps = -10:0.5:10
+variance = 16
+
+fire_freqs = []
+retval = 1
+for amp in amps
+    println(amp)
+    distr = Normal(amp, variance)
+    test_net = construct_wide_network(N_layers, width, distr)
+
+    spikes = test_wide_network!(test_net, quiet_length, Tsim, width, dt)
+
+    output = analyze_spike_matrix(spikes, N_layers)
+
+    push!(fire_freqs, [output[j][1] for j in 2:N_layers])
+    retval = spikes
+end
 # %%
+plt.plot(amps, fire_freqs)
+plt.legend(["Layer $(j)" for j in 2:N_layers])
+
+# %%
+xs = []
+ys = []
+for pt in findall(retval.>0)
+    push!(xs, pt[2]*dt)
+    push!(ys, pt[1])
+end
+scatter(xs[500:1000], ys[500:1000])
+xlabel("Time (s)")
+ylabel("Neuron");
+
 # %%
 # %%
 
