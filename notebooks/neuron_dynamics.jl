@@ -242,10 +242,10 @@ function construct_wide_network(N_layers, width, distr, neuron = nnsim.Izh)
 end
 
 # %%
-N_layers = 7
+N_layers = 12 
 width = 32 
 
-Tsim = 5. # seconds
+Tsim = 40. # seconds
 quiet_length = 0.01
 dt = 0.001
 
@@ -253,6 +253,7 @@ amps = -10:0.5:10
 variance = 16
 
 fire_freqs = []
+spike_list = []
 retval = 1
 for amp in amps
     println(amp)
@@ -260,26 +261,47 @@ for amp in amps
     test_net = construct_wide_network(N_layers, width, distr)
 
     spikes = test_wide_network!(test_net, quiet_length, Tsim, width, dt)
-
     output = analyze_spike_matrix(spikes, N_layers)
 
+    push!(spike_list, spikes)
     push!(fire_freqs, [output[j][1] for j in 2:N_layers])
-    retval = spikes
 end
 # %%
 plt.plot(amps, fire_freqs)
 plt.legend(["Layer $(j)" for j in 2:N_layers])
+plt.xlabel("Mean Spike Amplitude (mV)")
+plt.ylabel("Mean Spiking Rate (Hz)")
+plt.title("Spiking Rates vs Spike Amplitudes for a $(N_layers)x$(width) network")
+# savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs_by_layer_wide.png");
 
 # %%
+plt.figure(figsize=(8,10))
+plt.subplot(2,1,1)
+trial = 40
 xs = []
 ys = []
-for pt in findall(retval.>0)
+for pt in findall(spike_list[trial].>0)
     push!(xs, pt[2]*dt)
     push!(ys, pt[1])
 end
-scatter(xs[500:1000], ys[500:1000])
-xlabel("Time (s)")
-ylabel("Neuron");
+plt.scatter(xs, ys)
+plt.xlabel("Time (s)")
+plt.ylabel("Neuron");
+plt.title("Spiking Events with Amplitude = $(amps[trial]) mV")
+
+plt.subplot(2,1,2)
+trial = 30
+xs = []
+ys = []
+for pt in findall(spike_list[trial].>0)
+    push!(xs, pt[2]*dt)
+    push!(ys, pt[1])
+end
+plt.scatter(xs, ys)
+plt.xlabel("Time (s)")
+plt.ylabel("Neuron");
+plt.title("Spiking Events with Amplitude = $(amps[trial]) mV")
+savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_events_wide.png");
 
 # %%
 # %%
