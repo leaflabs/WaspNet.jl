@@ -275,21 +275,11 @@ plt.title("Spiking Rates vs Spike Amplitudes for a $(N_layers)x$(width) network"
 # savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs_by_layer_wide.png");
 
 # %%
+layer_cutoffs = hcat([32*j*ones(length(times)) for j in 1:(N_layers-1)]...)
+times = collect(0:dt:Tsim)
+
 plt.figure(figsize=(8,10))
 plt.subplot(2,1,1)
-trial = 40
-xs = []
-ys = []
-for pt in findall(spike_list[trial].>0)
-    push!(xs, pt[2]*dt)
-    push!(ys, pt[1])
-end
-plt.scatter(xs, ys)
-plt.xlabel("Time (s)")
-plt.ylabel("Neuron");
-plt.title("Spiking Events with Amplitude = $(amps[trial]) mV")
-
-plt.subplot(2,1,2)
 trial = 30
 xs = []
 ys = []
@@ -298,6 +288,21 @@ for pt in findall(spike_list[trial].>0)
     push!(ys, pt[1])
 end
 plt.scatter(xs, ys)
+plt.plot(times, layer_cutoffs, color="r")
+plt.xlabel("Time (s)")
+plt.ylabel("Neuron");
+plt.title("Spiking Events with Amplitude = $(amps[trial]) mV")
+
+plt.subplot(2,1,2)
+trial = 40
+xs = []
+ys = []
+for pt in findall(spike_list[trial].>0)
+    push!(xs, pt[2]*dt)
+    push!(ys, pt[1])
+end
+plt.scatter(xs, ys)
+plt.plot(times, layer_cutoffs, color="r")
 plt.xlabel("Time (s)")
 plt.ylabel("Neuron");
 plt.title("Spiking Events with Amplitude = $(amps[trial]) mV")
@@ -305,5 +310,4 @@ savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_events_wi
 
 # %%
 # %%
-
 # %%
