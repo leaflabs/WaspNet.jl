@@ -1,6 +1,6 @@
 
 # A Network comprises layers and handles passing inputs between layers. Furthemore,
-#   it also tracks the states of all of the neurons at each time step. 
+#   it also tracks the states of all of the neurons at each time step.
 mutable struct Network<:AbstractNetwork
     layers::Array{<:AbstractLayer, 1}  # Array of layers in order from input to output
     N_in::Int                          # Number of input dimensions
@@ -11,7 +11,7 @@ mutable struct Network<:AbstractNetwork
     t                                  # Internal time parameter
 end
 
-# Constructor for the Network which simply takes as input the layers in order from 
+# Constructor for the Network which simply takes as input the layers in order from
 #   first to last.
 function Network(layers::Array{<:AbstractLayer, 1})
     N_in = size(layers[1].W)[2] # Number of dimensions in the input space
@@ -46,7 +46,8 @@ end
 
 # Reset the Network to its initial state.
 function reset!(network::Network)
-    network_neur_states = Array{Any, 2}(undef, network.state_size, 1) 
+    network.neur_states = Array{Any, 2}(undef, network.state_size, 0)
+    network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), 0)
     network.t = 0.
     reset!.(network.layers)
     return nothing
@@ -60,16 +61,15 @@ function simulate!(network::Network, input, dt, tf, t0 = 0; track_flag = false)
 
     network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), length(t_steps))
     if track_flag
-        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps) + 1) 
+        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps))
         network.neur_states[:,1] .= get_neuron_states(network)
     end
 
     for (i,t) in zip(1:N_steps,t_steps)
         update!(network, input, dt, t)
         network.neur_outputs[:, i] = get_neuron_outputs(network)
-        # network.neur_outputs[:, i] .= neurons_out
         if track_flag
-            network.neur_states[:,i+1] .= get_neuron_states(network)
+            network.neur_states[:,i] .= get_neuron_states(network)
         end
         network.t += dt
     end
