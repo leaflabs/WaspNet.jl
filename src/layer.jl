@@ -2,6 +2,7 @@
 struct Layer{L<:AbstractNeuron,F<:Real}<:AbstractLayer
     neurons::Array{L,1}
     output::Array{F,1}
+    conns::Array{Int,1}
     W # TODO: Make type union with sparse matrices, if sparse matrices end up efficient
     N_neurons
 end
@@ -10,7 +11,7 @@ end
 #   subject to an input from the previous layer `input`.
 function update!(l::Layer, input, dt, t)
     if any(input != 0)
-        l.output .= update!.(l.neurons, l.W*input, dt, t) # this returns retval, either 0 or 1
+        l.output .= update!.(l.neurons, l.W*input, dt, t) # TODO: change input radically
     else
         l.output .= update!.(l.neurons, 0, dt, t)
     end

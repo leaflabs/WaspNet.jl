@@ -39,9 +39,14 @@ function update!(network::Network, input, dt, t)
         # (prev,layer)-> update!(layer, prev, dt, t), network.layers, init=input
         # )
     # return retval, out_vec
-    return foldl(
-        (prev,layer)-> update!(layer, prev, dt, t), network.layers, init=input
-        )
+    # return foldl(
+    #     (prev,layer)-> update!(layer, prev, dt, t), network.layers, init=input
+    #     )
+    index = [1; accumulate(+,[l.N_neurons for l in network.layers])] #TODO modify network constructor to specify this as part of the struct
+    prev_out = vcat([l.output for l in network.layers]...)
+    for i in 1:(length(index)-1)
+        update!(network.layers[i],prev_out,dt,t)#,view(prev_out,index[i]:index[i+1]),dt,t)
+    end
 end
 
 # Reset the Network to its initial state.
