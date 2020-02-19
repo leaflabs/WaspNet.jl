@@ -5,6 +5,7 @@ using Parameters
 using BlockArrays
 using Distributions
 using Random
+using LinearAlgebra
 
 include("types.jl")
 include("neurons.jl")

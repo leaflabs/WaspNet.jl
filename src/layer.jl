@@ -11,7 +11,11 @@ end
 #   subject to an input from the previous layer `input`.
 function update!(l::Layer, input, dt, t)
     if any(input != 0)
-        l.output .= update!.(l.neurons, l.W*input, dt, t) # TODO: change input radically
+        trans_inp = zeros(l.N_neurons) # pre-allocate all zeros array
+        for i in l.conns # loop over non-zero incoming connections and summate signals
+            trans_inp += (l.W[Block(1,i+1)]*input[i+1])
+        end
+        l.output .= update!.(l.neurons, trans_inp, dt, t) # TODO: change input radically
     else
         l.output .= update!.(l.neurons, 0, dt, t)
     end
@@ -31,23 +35,4 @@ end
 # Get the output of each neuron at the current time in the layer
 function get_neuron_outputs(l::AbstractLayer)
     return l.output
-end
-
-mutable struct Recurrent_Layer{L<:AbstractNeuron,F<:Real}<:AbstractLayer
-    neurons::Array{L,1}
-    output::Array{F,1}
-    prev_output::Array{F,1}
-    W # input weights
-    W_re # recurrent weights
-    N_neurons
-end
-
-function update!(l::Recurrent_Layer, input, dt, t)
-    if any(input != 0)
-        l.prev_output = l.output # I think this is what's causing issues
-        l.output .= update!.(l.neurons, l.W*input + l.W_re*l.prev_output, dt, t)
-    else
-        l.prev_output = l.output
-        l.output .= update!.(l.neurons, l.W_re*l.prev_output, dt, t)
-    end
 end

@@ -21,14 +21,16 @@ net = Network([layer,layer]);
 
 network_constructor([layer])
 
+net = network_constructor(5,200)
 # Simulation Variables
 t0 = 0.
 dt = 0.001
+tf = 1.
+inp(t) = 5*ones(200)
 
-tf = 5.
 figure()
 reset!(net)
-@time outputs, states = nnsim.simulate!(net, zeros(N), dt, tf, track_flag = true)
+@time outputs, states = nnsim.simulate!(net, inp, dt, tf, track_flag = true)
 PyPlot.plot(t0:dt:tf, transpose(states[1:2:end,2:end]))
 xlabel("Time (s)")
 ylabel("Membrane Potential (mV)")

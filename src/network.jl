@@ -26,26 +26,9 @@ end
 # Evolve the entire Network a duration `dt` starting from time `t` according to the
 #   input `input`
 function update!(network::Network, input, dt, t)
-    # in_vec = input
-    # out_vec = zeros(get_neuron_count(network))
-    # start = 1
-    # for l in network.layers
-    #     in_vec = update!(l, in_vec, dt, t)
-    #     out_vec[start:start+l.N_neurons-1] .= in_vec
-    #     start += l.N_neurons
-    # end
-    # retval = out_vec[ (end-network.layers[end].N_neurons+1) : end]
-    # out_vec = foldl(
-        # (prev,layer)-> update!(layer, prev, dt, t), network.layers, init=input
-        # )
-    # return retval, out_vec
-    # return foldl(
-    #     (prev,layer)-> update!(layer, prev, dt, t), network.layers, init=input
-    #     )
-    index = [1; accumulate(+,[l.N_neurons for l in network.layers])] #TODO modify network constructor to specify this as part of the struct
-    prev_out = vcat([l.output for l in network.layers]...)
-    for i in 1:(length(index)-1)
-        update!(network.layers[i],prev_out,dt,t)#,view(prev_out,index[i]:index[i+1]),dt,t)
+    prev_out = vcat([input],[l.output for l in network.layers])
+    for i in 1:length(network.layers)
+        update!(network.layers[i],prev_out,dt,t)
     end
 end
 
@@ -71,7 +54,7 @@ function simulate!(network::Network, input, dt, tf, t0 = 0; track_flag = false)
     end
 
     for (i,t) in zip(1:N_steps,t_steps)
-        update!(network, input, dt, t)
+        update!(network, input(t), dt, t)
         network.neur_outputs[:, i] = get_neuron_outputs(network)
         if track_flag
             network.neur_states[:,i] .= get_neuron_states(network)
