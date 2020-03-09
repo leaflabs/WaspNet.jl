@@ -43,7 +43,7 @@ end
 
 function network_constructor(N_layers, N_neurons; n_constr = nnsim.Izh, connections = [], init_dist = Normal(0,1))
     if connections == []
-        connections = [[i] for i in 0:N_layers]
+        connections = [[i] for i in 0:(N_layers-1)]
     end
     layers = Vector{AbstractLayer}(undef,length(connections))
     for i in 1:length(connections)
