@@ -1,6 +1,6 @@
 
 # A Network comprises layers and handles passing inputs between layers. Furthemore,
-#   it also tracks the states of all of the neurons at each time step. 
+#   it also tracks the states of all of the neurons at each time step.
 mutable struct Network<:AbstractNetwork
     layers::Array{<:AbstractLayer, 1}  # Array of layers in order from input to output
     N_in::Int                          # Number of input dimensions
@@ -11,7 +11,7 @@ mutable struct Network<:AbstractNetwork
     t                                  # Internal time parameter
 end
 
-# Constructor for the Network which simply takes as input the layers in order from 
+# Constructor for the Network which simply takes as input the layers in order from
 #   first to last.
 function Network(layers::Array{<:AbstractLayer, 1})
     N_in = size(layers[1].W)[2] # Number of dimensions in the input space
@@ -26,22 +26,10 @@ end
 # Evolve the entire Network a duration `dt` starting from time `t` according to the
 #   input `input`
 function update!(network::Network, input, dt, t)
-    # in_vec = input
-    # out_vec = zeros(get_neuron_count(network))
-    # start = 1
-    # for l in network.layers
-    #     in_vec = update!(l, in_vec, dt, t)
-    #     out_vec[start:start+l.N_neurons-1] .= in_vec
-    #     start += l.N_neurons
-    # end
-    # retval = out_vec[ (end-network.layers[end].N_neurons+1) : end]
-    # out_vec = foldl(
-        # (prev,layer)-> update!(layer, prev, dt, t), network.layers, init=input
-        # )
-    # return retval, out_vec
-    return foldl(
-        (prev,layer)-> update!(layer, prev, dt, t), network.layers, init=input
-        )
+    prev_out = vcat([input],[l.output for l in network.layers])
+    for i in 1:length(network.layers)
+        update!(network.layers[i],prev_out,dt,t)
+    end
 end
 
 # Reset the Network to its initial state.
@@ -61,12 +49,12 @@ function simulate!(network::Network, input, dt, tf, t0 = 0; track_flag = false)
 
     network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), length(t_steps))
     if track_flag
-        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps)) 
+        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps))
         network.neur_states[:,1] .= get_neuron_states(network)
     end
 
     for (i,t) in zip(1:N_steps,t_steps)
-        update!(network, input, dt, t)
+        update!(network, input(t), dt, t)
         network.neur_outputs[:, i] = get_neuron_outputs(network)
         if track_flag
             network.neur_states[:,i] .= get_neuron_states(network)
