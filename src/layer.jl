@@ -7,6 +7,15 @@ struct Layer{L<:AbstractNeuron,F<:Real}<:AbstractLayer
     N_neurons
 end
 
+# Cover the case where conns isn't specified (defaults to feed-forward)
+function Layer(neurons, output, W::Array{<:Any,2}, N_neurons)
+    return Layer(neurons, output, Array{Int}(undef, 0), BlockArray(W), N_neurons)
+end
+
+function Layer(neurons, output, conns, W::Array{Any,2}, N_neurons)
+    return Layer(neurons, output, conns, BlockArray(W), N_neurons)
+end
+
 # Evolve all of the neurons in the layer a duration `dt` starting at the time `t`
 #   subject to an input from the previous layer `input`.
 function update!(l::Layer, input, dt, t)

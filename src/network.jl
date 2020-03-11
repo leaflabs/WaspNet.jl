@@ -47,9 +47,9 @@ function simulate!(network::Network, input, dt, tf, t0 = 0; track_flag = false)
     t_steps = t0:dt:tf
     N_steps = length(t_steps)
 
-    network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), length(t_steps))
+    network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), length(t_steps+1)) # +1 to get initial 
     if track_flag
-        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps))
+        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps+1))
         network.neur_states[:,1] .= get_neuron_states(network)
     end
 

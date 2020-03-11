@@ -50,14 +50,14 @@ using nnsim, Test
         W[1,2] = 2.
         W[2,2] = 1.
 
-        L = Layer([lif1, lif2], zeros(2), W, 2)
+        L = Layer([lif1, lif2], zeros(2), [0], W, 2)
 
-        update!(L, [0., 0.], 0.001, 0.)
+        update!(L, [[0., 0.]], 0.001, 0.)
         @test lif1.state[1] == lif2.state[1]    # Both neurons are initialized to same state
         s10 = lif1.state[1]
         s20 = lif2.state[1]
 
-        update!(L, [2., 3.], 0., 0.)
+        update!(L, [[2., 3.]], 0., 0.)
         @test lif1.state[1] == s10 + 8.         # Inputs are routed correctly
         @test lif2.state[1] == s20 + 3.         
 
@@ -84,11 +84,11 @@ using nnsim, Test
         # L2 = batch_layer_construction(nnsim.Izh, W2, N)
 
         @testset "Homogeneous Networks" begin 
-            W1 = randn(N, N_in)
-            W2 = randn(N, N)
+            # W1 = randn(N, N_in)
+            # W2 = randn(N, N)
 
-            L1 = batch_layer_construction(nnsim.LIF, W1, N)
-            L2 = batch_layer_construction(nnsim.LIF, W2, N)
+            L1 = layer_constructor(nnsim.LIF, N, 2, [0])
+            L2 = layer_constructor(nnsim.LIF, N, 2, [1])
             net_hom = Network([L1, L2])
             state0 = L1.neurons[1].state[1]
             v0 = L1.neurons[1].v0

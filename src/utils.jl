@@ -26,7 +26,7 @@ function batch_layer_construction(n_constr, W, N_neurons; recurrent = false, kwa
     end
 end
 
-function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dist)
+function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dist = Normal(0,1))
     neurons = fill(n_constr(), N_neurons)
     W = BlockArray(zeros(N_neurons, N_neurons*(N_layers+1)), [N_neurons], fill(N_neurons, N_layers+1))
     print(length(W))
