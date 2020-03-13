@@ -29,8 +29,8 @@ end
 function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dist = Normal(0,1))
     neurons = fill(n_constr(), N_neurons)
     W = BlockArray(zeros(N_neurons, N_neurons*(N_layers+1)), [N_neurons], fill(N_neurons, N_layers+1))
-    print(length(W))
     for input_layer in input_layers
+        # TODO: We should not assume N_inputs == N_layer_neurons
         if input_layer == 0
             W[Block(1,input_layer+1)] = Matrix(1I,N_neurons,N_neurons)
         else

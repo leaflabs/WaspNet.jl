@@ -43,21 +43,29 @@ end
 
 # Simulate the network from `t0` to `tf` with a time step of `dt` with an input to
 #   the first layer of `input`
-function simulate!(network::Network, input, dt, tf, t0 = 0; track_flag = false)
-    t_steps = t0:dt:tf
+function simulate!(network::Network, input, dt, tf, t0 = 0.; track_flag = false)
+    # t_steps are time points where we evaluate the input function
+    # There are ((tf-t0)/dt)+1 time steps, including t0 as the first time step
+    # Thus, we evolve the network assuming it is evaluated at the initial time step for
+    # every time step, meaning the network ends with t=tf but the last evaluation of input
+    # happens at time t=tf-dt
+    t_steps = t0:dt:(tf-dt)
     N_steps = length(t_steps)
 
-    network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), length(t_steps+1)) # +1 to get initial 
+    # The +1 here is to ensure that we get the initial state at t=t0 in the outputs
+    network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), N_steps+1) 
+    network.neur_outputs[:, 1] = get_neuron_outputs(network) 
     if track_flag
-        network.neur_states = Array{Any, 2}(undef, network.state_size, length(t_steps+1))
+        network.neur_states = Array{Any, 2}(undef, network.state_size, N_steps+1)
         network.neur_states[:,1] .= get_neuron_states(network)
     end
 
     for (i,t) in zip(1:N_steps,t_steps)
         update!(network, input(t), dt, t)
-        network.neur_outputs[:, i] = get_neuron_outputs(network)
+        # The +1 here is the offset from including the initial values in the outputs
+        network.neur_outputs[:, i+1] = get_neuron_outputs(network)
         if track_flag
-            network.neur_states[:,i] .= get_neuron_states(network)
+            network.neur_states[:,i+1] .= get_neuron_states(network)
         end
         network.t += dt
     end
