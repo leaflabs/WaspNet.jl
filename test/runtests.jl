@@ -81,12 +81,7 @@ using nnsim, Test
         N = 32
         N_in = 16
         
-        # L2 = batch_layer_construction(nnsim.Izh, W2, N)
-
         @testset "Homogeneous Networks" begin 
-            # W1 = randn(N, N_in)
-            # W2 = randn(N, N)
-
             L1 = layer_constructor(nnsim.LIF, N, 2, [0])
             L2 = layer_constructor(nnsim.LIF, N, 2, [1])
             net_hom = Network([L1, L2])
@@ -97,20 +92,22 @@ using nnsim, Test
                 all(nnsim.get_neuron_states(net_hom) .== state0)
             end
 
-            @test begin                         # Update works, not evolving system 
-                all(update!(net_hom, 0, 0, 0) .== 0)
+            @test begin                         # Update works, not evolving system/state unchanged
+                update!(net_hom, zeros(Float64, 32), 0, 0)
+                all(nnsim.get_neuron_states(net_hom) .== state0)
             end
 
             @test begin                         # Neuron Outputs function works
                 all(nnsim.get_neuron_outputs(net_hom) .== 0)
             end
 
-            outputs, states = simulate!(net_hom, 0, 0.001, 1., track_flag = true)                
+            input_fun(t) = zeros(Float64, 32) 
+
+            outputs, states = simulate!(net_hom, input_fun, 0.001, 1., track_flag = true)                
             @test begin                         # Check neuron output matrix size
                 all(size(outputs) .== [2*N, 1001])            
             end
 
-            println(size(states))
             @test begin                         # Check neuron output matrix size
                 all(size(states) .== [2*N, 1001])            
             end
