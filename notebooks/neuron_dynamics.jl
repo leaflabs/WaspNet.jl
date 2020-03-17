@@ -2,6 +2,7 @@
 using PyPlot
 using Statistics 
 using Distributions # Used to generate 
+using Revise        # Used to make edits to source, not necessary for running
 
 using nnsim
 
@@ -65,12 +66,12 @@ function _analyze_spike_set(spikes, dt = 0.001)
     return (_mean, _median, _min, _max)
 end
 
-ber = Bernoulli(0.2)
-data = rand(ber, 5, 1000)
-println(_analyze_spike_set(data))
-for j in 1:5
-    println(_analyze_spike_set(data[j,:]))
-end
+# ber = Bernoulli(0.2)
+# data = rand(ber, 5, 1000)
+# println(_analyze_spike_set(data))
+# for j in 1:5
+#     println(_analyze_spike_set(data[j,:]))
+# end
 
 # %%
 #================================================================================
@@ -129,8 +130,7 @@ plt.ylabel("Spiking Frequency (Hz)")
 plt.title("Spiking Frequency at various Amplitudes, Incoming Spike Periods")
 plt.legend(["$(round(Int, x*1000)) ms" for x in (quiet_lengths)])
 
-savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs.png");
-
+# savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs.png");
 # %%
 #================================================================================
 
@@ -163,8 +163,10 @@ function test_network!(network, quiet_length, Tsim, dt = 0.001)
 end
 
 function construct_linear_network(N_layers, amplitude, neuron = nnsim.Izh)
-    layers = [Layer([neuron()], zeros(1), ones(1,1)*amplitude, 1)  for _ in 1:N_layers]
-    return Network(layers)
+    dist = Normal(amplitude, 0.) # amplitude-mean, 0 variance
+    return network_constructor(N_layers, 1, n_constr = neuron, init_dist = dist)
+    # layers = fill(Layer([neuron()], zeros(1), ones(1,1)*amplitude, 1), N_layers)
+    # return Network(layers)
 end
 
 # %%
@@ -193,7 +195,7 @@ plt.ylabel("Spiking Frequency (Hz)")
 plt.title("Spiking Frequency at various Amplitudes, Layer Level")
 plt.legend(["Layer $(x)" for x in 1:max_layers])
 
-savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs_by_layer_single_chain.png");
+# savefig("/home/buercklin/Documents/Figures/nnsim/neuron_dynamics/spike_freqs_by_layer_single_chain.png");
 
 # %%
 #================================================================================
