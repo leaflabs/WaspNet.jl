@@ -120,4 +120,45 @@ using nnsim, Test
 
     end
 
+    @testset "Utility Functions" begin
+
+        @testset "deepcopy_field_update" begin 
+            struct Foo
+                x
+                y
+            end;
+            
+            # Copies scalar values
+            @test begin
+                foo1 = Foo(1,2)
+                foo2 = nnsim.deepcopy_field_update(foo1, [], [])
+                (foo1 == foo2)
+            end
+
+            # Deep copy of lists
+            @test begin
+                foo1 = Foo([1,2], 3)
+                foo2 = nnsim.deepcopy_field_update(foo1, [], [])
+                foo1.x .= [4,5]
+                (all(foo2.x .== [1, 2])) && (foo2.y == 3)
+            end
+
+            # Replaces single value
+            @test begin
+                foo1 = Foo(1,2)
+                foo2 = nnsim.deepcopy_field_update(foo1, [:x], [2])
+                (foo2.x == 2) && (foo1.y == foo2.y)
+            end
+
+            # Replace multiple values
+            @test begin
+                foo1 = Foo(1,2)
+                foo2 = nnsim.deepcopy_field_update(foo1, [:x, :y], [foo1.y, foo1.x])
+                (foo2.x == foo1.y) && (foo2.y == foo1.x)
+            end
+
+        end
+
+    end
+
 end;
