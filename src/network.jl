@@ -2,13 +2,47 @@
 # A Network comprises layers and handles passing inputs between layers. Furthemore,
 #   it also tracks the states of all of the neurons at each time step.
 mutable struct Network<:AbstractNetwork
-    layers::Array{<:AbstractLayer, 1}  # Array of layers in order from input to output
+    layers::Array{AbstractLayer, 1}  # Array of layers in order from input to output
     N_in::Int                          # Number of input dimensions
     N_out::Int                         # Number of output dimensions
     neur_states::Matrix                # The states of each neuron for each time step
     neur_outputs::Matrix               # The outputs of each neuron for each time step
     state_size::Int
     t                                  # Internal time parameter
+end
+
+# Very general constructor which connects layers (including FF with undefined conns) and 
+#   arranges the block arrays in each layer. Each layer in the Network is a deepcopy of 
+#   the layers fed in, aside from the fields which are explicitly changed.
+function Network(layers, N_in::Int) 
+    neurons_per_layer = [length(l.neurons) for l in layers]
+    output_sizes = vcat([N_in], neurons_per_layer) # number of signals passed out of each layer incl. input
+    
+    N_layers = length(layers)
+    N_neurons = sum(neurons_per_layer)
+    N_out = neurons_per_layer[end]
+
+    state_size = sum([length(get_neuron_states(l)) for l in layers])
+    neur_states = zeros(state_size, 1)
+    neur_outputs = zeros(N_neurons, 1)
+
+    net_layers = []
+    for (i,l) in enumerate(layers)
+        N_layer_neurons = length(l.neurons)
+        # TODO: maybe convert this to PseudoBlockArray
+        W = BlockArray(zeros(N_layer_neurons, N_neurons + N_in), [N_layer_neurons], output_sizes)
+        conns = []
+        if isempty(l.conns)
+            push!(conns, i-1)
+            setblock!(W, l.W, 1, i)
+        else
+            W = copy(l.W)
+        end
+        new_layer = deepcopy_field_update(l, [:conns, :W], [conns, W])
+        push!(net_layers, new_layer)
+    end
+
+    return Network(net_layers, N_in, N_out, neur_states, neur_outputs, state_size, 0.)
 end
 
 # Constructor for the Network which simply takes as input the layers in order from
