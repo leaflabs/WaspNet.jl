@@ -56,14 +56,18 @@ end
 
 # Constructor for the Network which simply takes as input the layers in order from
 #   first to last.
-function Network( layers::Array{<:AbstractLayer, 1})
-    N_in = size(layers[1].W)[2] # Number of dimensions in the input space
-    N_out = size(layers[end].W)[1] # Number of output dimensions
-    N_neurons = sum(map(l -> l.N_neurons, layers))
+function Network(layers::Array{<:AbstractLayer, 1})
+    in_layer = layers[1]
+    N_in = 0
+    if isa(in_layer.W, Matrix)
+        N_in = size(in_layer.W)[2]
+    elseif isa(in_layer.W, AbstractBlockArray )
+        N_in = size(in_layer.W[Block(1,1)])[2]
+    else
+        error("Layer weights should be either a Matrix or BlockArray, given a $(typeof(in_layer.W))")
+    end
 
-    state_size = sum([length(l.neurons[1].state)*length(l.neurons) for l in layers])
-
-    return Network(layers, N_in, N_out, zeros(state_size, 1), zeros(state_size, 1), state_size, 0.0)
+    return Network(layers, N_in)
 end
 
 # Evolve the entire Network a duration `dt` starting from time `t` according to the
