@@ -19,11 +19,7 @@ function batch_layer_construction(n_constr, W, N_neurons; recurrent = false, kwa
     # Broadcast over the ordered arguments which are potentially arrays, and include a zeros(...)
     #   vector so that we always return the correct number of neurons.
     neurons = bcast_function.(zeros(N_neurons), ordered_args...)
-    if recurrent == false
-        return Layer(neurons, zeros(N_neurons), W, N_neurons)
-    else
-        return Recurrent_Layer(neurons, zeros(N_neurons), zeros(N_neurons), W, W, N_neurons) # TODO change so that recurrent weight matrix can be different from input matrix
-    end
+    return Layer(neurons, zeros(N_neurons), W, N_neurons)
 end
 
 function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dist = Normal(0,1))

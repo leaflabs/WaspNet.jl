@@ -41,23 +41,26 @@ function Layer(
     return Layer(neurons, output, conns, W, N_neurons, input) 
 end
 
+
+
+
+
+
 # Evolve all of the neurons in the layer a duration `dt` starting at the time `t`
 #   subject to an input from the previous layer `input`. 
 #   Assumes a BlockArray W
 function update!(l::Layer{L,F,M}, input, dt, t) where {L,F, M<:AbstractBlockArray}
-    nonzero_inputs = [!(all(input[i+1] .== 0)) for i in l.conns]
+    # nonzero_inputs = [!(all(input[i+1] .== 0)) for i in l.conns]
     l.input .= 0 # reset the input vector to the layer
 
-    if any(nonzero_inputs)
-        for conn in l.conns
-            if nonzero_inputs[conn+1]
-                l.input .+= l.W[Block(1, conn+1)]*input[conn+1]
-            end
+    for conn in l.conns
+        nonzero_input = !(all(input[conn+1] .== 0))
+        if nonzero_input
+            l.input .+= l.W[Block(1, conn+1)]*input[conn+1]
         end
     end
 
     l.output .= update!.(l.neurons, l.input, dt, t)
-    
     return l.output
 end
 
@@ -65,16 +68,22 @@ end
 #   subject to an input from the previous layer `input`. 
 #   Assumes a Matrix W
 function update!(l::Layer{L,F,M}, input, dt, t) where {L, F, M<:Matrix}
-    nonzero_inputs = [!(all(input[i+1] .== 0)) for i in l.conns]
-
-    if any(nonzero_inputs)
-        l.input .= l.W*input[l.conns[1]+1]
+    for conn in l.conns
+        nonzero_input = !(all(input[conn+1] .== 0))
+        if nonzero_input
+            l.input .= l.W*input[conn+1]
+        end
     end
 
     l.output .= update!.(l.neurons, l.input, dt, t)
-
     return l.output
 end
+
+
+
+
+
+
 
 
 function reset!(l::AbstractLayer)
