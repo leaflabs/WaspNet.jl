@@ -10,12 +10,16 @@ mutable struct Network<:AbstractNetwork
     state_size::Int
     t                                  # Internal time parameter
 
+    prev_outputs::Vector               # Vector to pre-allocate storage for feeding into layers
+
     function Network(layers, N_in, N_out, neur_states, neur_outputs, state_size, t)
         neurons_per_layer = [length(l.neurons) for l in layers]
         output_sizes = vcat([N_in], neurons_per_layer) # number of signals passed out of each layer incl. input
-    
+
         N_layers = length(layers)
         N_neurons = sum(neurons_per_layer)
+
+        prev_outputs = zeros(N_in + N_neurons)
 
         net_layers = []
         for (i,l) in enumerate(layers)
@@ -33,7 +37,7 @@ mutable struct Network<:AbstractNetwork
             push!(net_layers, new_layer)
         end
 
-        return new(net_layers, N_in, N_out, neur_states, neur_outputs, state_size, 0.)
+        return new(net_layers, N_in, N_out, neur_states, neur_outputs, state_size, 0., prev_outputs)
     end
 end
 
@@ -73,9 +77,17 @@ end
 # Evolve the entire Network a duration `dt` starting from time `t` according to the
 #   input `input`
 function update!(network::Network, input, dt, t)
-    prev_out = vcat([input],[l.output for l in network.layers])
+    first_idx = 1
+    last_idx = network.N_in
+    network.prev_outputs[first_idx:last_idx] .= input
+    for l in network.layers
+        first_idx = last_idx+1
+        last_idx = (first_idx+l.N_neurons) - 1
+        network.prev_outputs[first_idx:last_idx] = l.output
+    end
+
     for i in 1:length(network.layers)
-        update!(network.layers[i],prev_out,dt,t)
+        update!(network.layers[i],network.prev_outputs,dt,t)
     end
 end
 

@@ -11,5 +11,7 @@
 - [X] Test deepcopy utility function
 - [ ] Tests for heterogeneous networks
 
+- [ ] Update `Layer` to handle the weight matrices at construction-time for both Arrays + Block Arrays
+- [ ] Update `Layer` to preallocate space for input vectors to avoid re-allocation at every `update!`
 - [ ] Test all `Layer` method
 
