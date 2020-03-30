@@ -1,44 +1,54 @@
 # Layer, a collection of neurons of the same type being driven by some input vector
 struct Layer{L<:AbstractNeuron, F<:Real, M<:Union{Matrix,AbstractBlockArray}}<:AbstractLayer
     neurons::Array{L,1}
-    output::Array{F,1}
-    conns::Array{Int,1}
     W::M # TODO: Make type union with sparse matrices, if sparse matrices end up efficient
-    N_neurons
+    conns::Array{Int,1}
+
+    N_neurons::Int
 
     input::Array{F,1}
+    output::Array{F,1}
 
-    # Default constructor, nonparametric
+    # Default constructor, nonparametric. Mainly used for external calling to compute types
     function Layer(
-        neurons::Array{L,1}, output::Array{F,1}, conns, W::M, N_neurons, input
+        neurons::Array{L,1}, W::M, conns,  N_neurons, input::Array{F,1}, output::Array{F,1}
         ) where {L <: AbstractNeuron, F <: Real, M <: Union{Matrix,AbstractBlockArray}}
 
-        return Layer{L, F, M}(neurons, output, conns, W, N_neurons, input)
+        return Layer{L, F, M}(neurons, W, conns, N_neurons, input, output)
     end
 
-    # Default constructor, parametric
+    # Default constructor, parametric. All Layers use this constructor eventually
     function Layer{L,F,M}(
-        neurons::Array{L,1}, output::Array{F,1}, conns, W::M, N_neurons, input
+        neurons::Array{L,1}, W::M, conns, N_neurons, input::Array{F,1}, output::Array{F,1} 
         ) where {L <: AbstractNeuron, F <: Real, M <: Union{Matrix, AbstractBlockArray}}
 
-        return new{L, F, M}(neurons, output, conns, W, N_neurons, input)
+        if isempty(conns)
+            conns = [0]
+        end
+        return new{L, F, M}(neurons, W, conns, N_neurons, input, output)
     end
 end
 
 # Cover the case where conns isn't specified (defaults to feed-forward), this only
 #   support matrix-types (not block arrays) for W.
-function Layer(neurons, output, W::Matrix, N_neurons)
-    return Layer(neurons, output, Array{Int}(undef, 0), W, N_neurons)
+function Layer(neurons, W::Matrix)
+    conns = Array{Int}(undef, 0)
+    N_neurons = length(neurons)
+    input = zeros(N_neurons)
+    output = zeros(N_neurons)
+
+    return Layer(neurons, W, conns, N_neurons, input, output)
 end
 
 # Cover the case where `conns` is specified, since we might not be feed-forward we 
 #   permit both matrices and block arrays for W.
-function Layer(
-    neurons::Array{L,1}, output::Array{F,1}, conns, W::M, N_neurons
+function Layer( neurons::Array{L,1}, W::M, conns
     ) where {L <: AbstractNeuron, F <: Real, M<:Union{Matrix,AbstractBlockArray}}
 
-    input = zeros(length(neurons))
-    return Layer(neurons, output, conns, W, N_neurons, input) 
+    N_neurons = length(neurons)
+    input = zeros(N_neurons)
+    output = zeros(N_neurons)
+    return Layer(neurons, W, conns, N_neurons, input, output) 
 end
 
 

@@ -13,7 +13,7 @@
 
 - [X] Update `Layer` to handle the weight matrices at construction-time for both Arrays + Block Arrays
 - [X] Update `Layer` to preallocate space for input vectors to avoid re-allocation at every `update!`
-- [ ] Organize the `Layer` constructors better; agree on typical use case and write for that
+- [X] Organize the `Layer` constructors better; agree on typical use case and write for that
 - [ ] Test all `Layer` method
 
 

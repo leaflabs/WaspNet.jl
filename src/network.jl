@@ -65,7 +65,7 @@ function Network(layers::Array{<:AbstractLayer, 1})
     N_in = 0
     if isa(in_layer.W, Matrix)
         N_in = size(in_layer.W)[2]
-    elseif isa(in_layer.W, AbstractBlockArray )
+    elseif isa(in_layer.W, AbstractBlockArray)
         N_in = size(in_layer.W[Block(1,1)])[2]
     else
         error("Layer weights should be either a Matrix or BlockArray, given a $(typeof(in_layer.W))")

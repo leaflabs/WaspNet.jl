@@ -50,7 +50,7 @@ using nnsim, Test
         W[1,2] = 2.
         W[2,2] = 1.
 
-        L = Layer([lif1, lif2], zeros(2), [0], W, 2)
+        L = Layer([lif1, lif2], W)
 
         update!(L, [[0., 0.]], 0.001, 0.)
         @test lif1.state[1] == lif2.state[1]    # Both neurons are initialized to same state
