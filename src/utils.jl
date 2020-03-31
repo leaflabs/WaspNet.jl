@@ -20,7 +20,6 @@ function batch_layer_construction(n_constr, W, N_neurons; recurrent = false, kwa
     #   vector so that we always return the correct number of neurons.
     neurons = bcast_function.(zeros(N_neurons), ordered_args...)
     return Layer(neurons, W)
-    # return Layer(neurons, zeros(N_neurons), W, N_neurons)
 end
 
 function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dist = Normal(0,1))
@@ -37,7 +36,6 @@ function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dis
         end
     end
     return Layer(neurons, W, input_layers)
-    # return Layer(neurons, zeros(N_neurons), input_layers, W, N_neurons)
 end
 
 function network_constructor(N_layers, N_neurons; n_constr = nnsim.Izh, connections = [], init_dist = Normal(0,1))

@@ -51,16 +51,10 @@ function Layer( neurons::Array{L,1}, W::M, conns
     return Layer(neurons, W, conns, N_neurons, input, output) 
 end
 
-
-
-
-
-
 # Evolve all of the neurons in the layer a duration `dt` starting at the time `t`
 #   subject to an input from the previous layer `input`. 
 #   Assumes a BlockArray W
 function update!(l::Layer{L,F,M}, input, dt, t) where {L,F, M<:AbstractBlockArray}
-    # nonzero_inputs = [!(all(input[i+1] .== 0)) for i in l.conns]
     l.input .= 0 # reset the input vector to the layer
 
     for conn in l.conns
@@ -88,13 +82,6 @@ function update!(l::Layer{L,F,M}, input, dt, t) where {L, F, M<:Matrix}
     l.output .= update!.(l.neurons, l.input, dt, t)
     return l.output
 end
-
-
-
-
-
-
-
 
 function reset!(l::AbstractLayer)
     reset!.(l.neurons)
