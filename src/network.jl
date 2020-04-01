@@ -19,7 +19,7 @@ mutable struct Network<:AbstractNetwork
         N_layers = length(layers)
         N_neurons = sum(neurons_per_layer)
 
-        prev_outputs = zeros(N_in + N_neurons)
+        prev_outputs = [zeros(N_in), [zeros(j) for j in neurons_per_layer]...]
 
         net_layers = []
         for (i,l) in enumerate(layers)
@@ -79,11 +79,9 @@ end
 function update!(network::Network, input, dt, t)
     first_idx = 1
     last_idx = network.N_in
-    network.prev_outputs[first_idx:last_idx] .= input
-    for l in network.layers
-        first_idx = last_idx+1
-        last_idx = (first_idx+l.N_neurons) - 1
-        network.prev_outputs[first_idx:last_idx] = l.output
+    network.prev_outputs[1] .= input
+    for (i,l) in enumerate(network.layers)
+        network.prev_outputs[i] .= l.output
     end
 
     for i in 1:length(network.layers)
