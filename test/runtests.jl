@@ -82,9 +82,14 @@ using nnsim, Test
         N_in = 16
         
         @testset "Homogeneous Networks" begin 
-            L1 = layer_constructor(nnsim.LIF, N, 2, [0])
-            L2 = layer_constructor(nnsim.LIF, N, 2, [1])
-            net_hom = Network([L1, L2])
+            neurons1 = [nnsim.LIF() for _ in 1:N]
+            W1 = randn(N, N_in)
+            neurons2 = [nnsim.LIF() for _ in 1:N]
+            W2 = randn(N, N)
+            L1 = Layer(neurons1, W1)
+            L2 = Layer(neurons2, W2)
+            net_hom = Network([L1, L2], N_in)
+            
             state0 = L1.neurons[1].state[1]
             v0 = L1.neurons[1].v0
 
@@ -92,8 +97,12 @@ using nnsim, Test
                 all(nnsim.get_neuron_states(net_hom) .== state0)
             end
 
+            @test begin
+                (all(net_hom.layers[1].conns .== [0]) && all(net_hom.layers[2].conns .== [1]))
+            end
+
             @test begin                         # Update works, not evolving system/state unchanged
-                update!(net_hom, zeros(Float64, 32), 0, 0)
+                update!(net_hom, zeros(Float64, N_in), 0, 0)
                 all(nnsim.get_neuron_states(net_hom) .== state0)
             end
 
@@ -101,7 +110,7 @@ using nnsim, Test
                 all(nnsim.get_neuron_outputs(net_hom) .== 0)
             end
 
-            input_fun(t) = zeros(Float64, 32) 
+            input_fun(t) = zeros(Float64, N_in) 
 
             outputs, states = simulate!(net_hom, input_fun, 0.001, 1., track_flag = true)                
             @test begin                         # Check neuron output matrix size
@@ -122,42 +131,6 @@ using nnsim, Test
 
     @testset "Utility Functions" begin
 
-        @testset "deepcopy_field_update" begin 
-            struct Foo
-                x
-                y
-            end;
-            
-            # Copies scalar values
-            @test begin
-                foo1 = Foo(1,2)
-                foo2 = nnsim.deepcopy_field_update(foo1, [], [])
-                (foo1 == foo2)
-            end
-
-            # Deep copy of lists
-            @test begin
-                foo1 = Foo([1,2], 3)
-                foo2 = nnsim.deepcopy_field_update(foo1, [], [])
-                foo1.x .= [4,5]
-                (all(foo2.x .== [1, 2])) && (foo2.y == 3)
-            end
-
-            # Replaces single value
-            @test begin
-                foo1 = Foo(1,2)
-                foo2 = nnsim.deepcopy_field_update(foo1, [:x], [2])
-                (foo2.x == 2) && (foo1.y == foo2.y)
-            end
-
-            # Replace multiple values
-            @test begin
-                foo1 = Foo(1,2)
-                foo2 = nnsim.deepcopy_field_update(foo1, [:x, :y], [foo1.y, foo1.x])
-                (foo2.x == foo1.y) && (foo2.y == foo1.x)
-            end
-
-        end
 
     end
 

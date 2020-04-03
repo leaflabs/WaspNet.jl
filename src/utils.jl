@@ -49,21 +49,3 @@ function network_constructor(N_layers, N_neurons; n_constr = nnsim.Izh, connecti
     end
     return Network(layers)
 end
-
-
-# Returns a deep copy of `input`, aside from `input.d_field` which assigned the value of `newval`
-# Note that `d_field` is an expression, so if `d_field = :x`, this will replace `input.x`
-function deepcopy_field_update(input, d_fields, newvals)
-    copy_type = typeof(input)
-    fields = fieldnames(copy_type)
-    field_args = []
-    for f in fields
-        if f in d_fields
-            idx = findfirst(d_fields .== f)
-            push!(field_args, newvals[idx])
-        else
-            push!(field_args, deepcopy(getfield(input, f)))
-        end
-    end
-    return copy_type(field_args...)
-end

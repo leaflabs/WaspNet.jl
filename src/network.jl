@@ -26,14 +26,16 @@ mutable struct Network<:AbstractNetwork
             N_layer_neurons = length(l.neurons)
             # TODO: maybe convert this to PseudoBlockArray
             W = BlockArray(zeros(N_layer_neurons, N_neurons + N_in), [N_layer_neurons], output_sizes)
-            conns = []
+            conns = Array{Int,1}()
             if isempty(l.conns)
                 push!(conns, i-1)
                 setblock!(W, l.W, 1, i)
+                new_layer = Layer(l.neurons, W, conns, l.N_neurons, l.input, l.output)
             else
+                conns = copy(l.conns)
                 W = copy(l.W)
+                new_layer = deepcopy(l)#_field_update(l, [:conns, :W], [conns, W])
             end
-            new_layer = deepcopy_field_update(l, [:conns, :W], [conns, W])
             push!(net_layers, new_layer)
         end
 
@@ -81,7 +83,7 @@ function update!(network::Network, input, dt, t)
     last_idx = network.N_in
     network.prev_outputs[1] .= input
     for (i,l) in enumerate(network.layers)
-        network.prev_outputs[i] .= l.output
+        network.prev_outputs[i+1] .= l.output
     end
 
     for i in 1:length(network.layers)

@@ -2,7 +2,7 @@
 struct Layer{L<:AbstractNeuron, F<:Real, M<:Union{Matrix,AbstractBlockArray}}<:AbstractLayer
     neurons::Array{L,1}
     W::M # TODO: Make type union with sparse matrices, if sparse matrices end up efficient
-    conns::Array{Int,1}
+    conns::Array{Int, 1}
 
     N_neurons::Int
 
@@ -14,17 +14,18 @@ struct Layer{L<:AbstractNeuron, F<:Real, M<:Union{Matrix,AbstractBlockArray}}<:A
         neurons::Array{L,1}, W::M, conns,  N_neurons, input::Array{F,1}, output::Array{F,1}
         ) where {L <: AbstractNeuron, F <: Real, M <: Union{Matrix,AbstractBlockArray}}
 
+        if isempty(conns)
+            conns = Array{Int,1}()
+        end
+
         return Layer{L, F, M}(neurons, W, conns, N_neurons, input, output)
     end
 
     # Default constructor, parametric. All Layers use this constructor eventually
     function Layer{L,F,M}(
-        neurons::Array{L,1}, W::M, conns, N_neurons, input::Array{F,1}, output::Array{F,1} 
+        neurons::Array{L,1}, W::M, conns::Array{Int,1}, N_neurons::Int, input::Array{F,1}, output::Array{F,1} 
         ) where {L <: AbstractNeuron, F <: Real, M <: Union{Matrix, AbstractBlockArray}}
 
-        if isempty(conns)
-            conns = [0]
-        end
         return new{L, F, M}(neurons, W, conns, N_neurons, input, output)
     end
 end
@@ -48,6 +49,9 @@ function Layer( neurons::Array{L,1}, W::M, conns
     N_neurons = length(neurons)
     input = zeros(N_neurons)
     output = zeros(N_neurons)
+    if size(W)[1] !== N_neurons
+        error("Weight Matrix and Neuron Count must be the same")
+    end
     return Layer(neurons, W, conns, N_neurons, input, output) 
 end
 
@@ -72,7 +76,10 @@ end
 #   subject to an input from the previous layer `input`. 
 #   Assumes a Matrix W
 function update!(l::Layer{L,F,M}, input, dt, t) where {L, F, M<:Matrix}
-    for conn in l.conns
+    if isempty(l.conns) && !(all(input[1] .== 0))
+        l.input .= l.W*input[1]
+    elseif !isempty(l.conns)
+        conn = l.conns[1] # should only have one connection
         nonzero_input = !(all(input[conn+1] .== 0))
         if nonzero_input
             l.input .= l.W*input[conn+1]
