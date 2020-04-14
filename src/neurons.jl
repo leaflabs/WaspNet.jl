@@ -206,3 +206,21 @@ end
 function reset!(neuron::ML)
     neuron.state .= [neuron.v0, neuron.u0]
 end
+
+# ReLU unit
+@with_kw struct ReLU{F}<:AbstractNeuron
+    v0::F = 0.     # Reset voltage (mV)
+    state::Array{F,1} = [0.]     # Membrane potential (mV)
+end
+
+# ReLU update function.  ReLU is memoryless, so dt and t are not used.
+# They are left as parameters for the sake of interoperability with existing function calls
+function update!(neuron::ReLU, input_update, dt, t)
+    # take maximum of 0 and the input, as per the definition
+    neuron.state[1] = max(0, input_update)
+    return neuron.state[1]
+end
+
+function reset!(neuron::ReLU)
+    neuron.state .= [neuron.v0]
+end
