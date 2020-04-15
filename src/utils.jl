@@ -23,7 +23,7 @@ function batch_layer_construction(n_constr, W, N_neurons; recurrent = false, kwa
 end
 
 function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dist = Normal(0,1))
-    neurons = fill(n_constr(), N_neurons)
+    neurons = [n_constr() for _ in 1:N_neurons]
     W = BlockArray(zeros(N_neurons, N_neurons*(N_layers+1)), [N_neurons], fill(N_neurons, N_layers+1))
     for input_layer in input_layers
         # TODO: We should not assume N_inputs == N_layer_neurons
@@ -35,6 +35,7 @@ function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dis
             W[Block(1,input_layer+1)] = rand!(init_dist, zeros(N_neurons,N_neurons))
         end
     end
+    println(input_layers)
     return Layer(neurons, W, input_layers)
 end
 

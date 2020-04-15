@@ -8,42 +8,42 @@ using nnsim, BlockArrays, Test
         @testset "LIF" begin
             lif = nnsim.LIF()
             @test lif.state[1] == lif.v0        # Constructor works
-            
+
             @test begin                         # Adding input to state without time evolution
                 update!(lif, 1, 0, 0)
-                lif.state[1] == lif.v0 + 1.   
+                lif.state[1] == lif.v0 + 1.
             end
 
             @test begin                         # Time evolution changes the state
                 update!(lif, 0, 0.001, 0)
-                lif.state[1] != lif.v0 + 1    
-            end 
+                lif.state[1] != lif.v0 + 1
+            end
 
             @test begin                         # Reset works
                 reset!(lif)
-                lif.state[1] == lif.v0        
+                lif.state[1] == lif.v0
             end
         end
 
         @testset "Izhikevich" begin
-            izh = nnsim.Izh()            
+            izh = nnsim.Izh()
             v0 = izh.v0
             u0 = izh.u0
             @test all(izh.state .== [v0, u0])   # Constructor works
 
             @test begin                         # Adding input to state without time evolution
                 update!(izh, 1, 0, 0)
-                all(izh.state .== [v0 + 1., u0])    
-            end                                 
+                all(izh.state .== [v0 + 1., u0])
+            end
 
             @test begin                         # Time evolution changes the state
-                update!(izh, 0, 0.001, 0)           
+                update!(izh, 0, 0.001, 0)
                 all(izh.state .!= [v0 + 1., u0])
-            end                                 
+            end
 
             @test begin
                 reset!(izh)
-                all(izh.state .== [v0, u0])      
+                all(izh.state .== [v0, u0])
             end                                 # Reset works
         end
     end
@@ -76,13 +76,13 @@ using nnsim, BlockArrays, Test
 
         update!(L, [[0., 0., 9.]], 0., 0.)
         @test begin                             # Inputs are routed correctly
-            ( (lif1.state[1] == s10 + 8.) &&         
-                (lif2.state[1] == s20 + 3.) )         
+            ( (lif1.state[1] == s10 + 8.) &&
+                (lif2.state[1] == s20 + 3.) )
         end
 
         @test begin                             # All neurons reset
             reset!(L)
-            ( (lif1.state[1] == -55.) && 
+            ( (lif1.state[1] == -55.) &&
                 (lif2.state[1] == -55.) )
         end
     end
@@ -132,8 +132,8 @@ using nnsim, BlockArrays, Test
     @testset "Networks" begin
         N = 32
         N_in = 16
-        
-        @testset "Homogeneous Networks FF" begin 
+
+        @testset "Homogeneous Networks FF" begin
             neurons1 = [nnsim.LIF() for _ in 1:N]
             W1 = randn(N, N_in)
             neurons2 = [nnsim.LIF() for _ in 1:N]
@@ -155,7 +155,7 @@ using nnsim, BlockArrays, Test
             @test begin                         # Layer block arrays should have correct size
                 ( all(size(net_hom.layers[1].W) .== [N, N_in + N + N]) &&
                     all(size(net_hom.layers[2].W) .== [N, N_in + N + N]) )
-            end 
+            end
 
             state0 = L1.neurons[1].state[1]
             v0 = L1.neurons[1].v0
@@ -177,14 +177,14 @@ using nnsim, BlockArrays, Test
                 all(nnsim.get_neuron_outputs(net_hom) .== 0)
             end
 
-            input_fun(t) = zeros(Float64, N_in) 
-            outputs, states = simulate!(net_hom, input_fun, 0.001, 1., track_flag = true)                
+            input_fun(t) = zeros(Float64, N_in)
+            outputs, states = simulate!(net_hom, input_fun, 0.001, 1., track_flag = true)
             @test begin                         # Check neuron output matrix size
-                all(size(outputs) .== [2*N, 1001])            
+                all(size(outputs) .== [2*N, 1001])
             end
 
             @test begin                         # Check neuron output matrix size
-                all(size(states) .== [2*N, 1001])            
+                all(size(states) .== [2*N, 1001])
             end
 
             @test begin                         # Reset the full network
@@ -195,12 +195,11 @@ using nnsim, BlockArrays, Test
 
     end
 
-    @testset "Utility Functions" begin        
+    @testset "Utility Functions" begin
         @test begin                             # All neurons in layer initialized correctly
-            W = zeros(2,2)
             v0 = nnsim.LIF().state[1]
-            b_layer = batch_layer_construction(nnsim.LIF, W, 2)
-            all([n.state[1] for n in b_layer.neurons] .== v0)
+            layer = layer_constructor(nnsim.LIF(), 2, 1, [])
+            all([n.state[1] for n in layer.neurons] .== v0)
         end
 
         @test begin                             # Function supports passing kwargs
