@@ -242,3 +242,20 @@ end
 function reset!(neuron::tanh)
     neuron.state .= [neuron.v0]
 end
+
+# sigmoid unit
+@with_kw struct sigmoid{F}<:AbstractNeuron
+    v0::F = 0.     # Reset voltage (mV)
+    state::Array{F,1} = [0.]     # Membrane potential (mV)
+end
+
+# sigmoid update function.  sigmoid is memoryless, so dt and t are not used.
+# They are left as parameters for the sake of interoperability with existing function calls
+function update!(neuron::sigmoid, input_update, dt, t)
+    neuron.state[1] = 1. / (1. + exp(-input_update))
+    return neuron.state[1]
+end
+
+function reset!(neuron::sigmoid)
+    neuron.state .= [neuron.v0]
+end
