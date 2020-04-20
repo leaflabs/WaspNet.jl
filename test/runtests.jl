@@ -46,6 +46,51 @@ using nnsim, BlockArrays, Test
                 all(izh.state .== [v0, u0])
             end                                 # Reset works
         end
+
+        @testset "ReLU" begin
+            ReLU = nnsim.ReLU()
+            @test ReLU.state[1] == ReLU.v0        # Constructor works
+
+            @test begin                         # Adding input to state without time evolution
+                update!(ReLU, 1, 0, 0)
+                ReLU.state[1] == 1.
+            end
+
+            @test begin                         # Reset works
+                reset!(ReLU)
+                ReLU.state[1] == ReLU.v0
+            end
+        end
+
+        @testset "tanh" begin
+            n_tanh = nnsim.tanh()
+            @test n_tanh.state[1] == n_tanh.v0        # Constructor works
+
+            @test begin                         # Adding input to state without time evolution
+                update!(n_tanh, 1, 0, 0)
+                n_tanh.state[1] == Base.tanh(1.)
+            end
+
+            @test begin                         # Reset works
+                reset!(n_tanh)
+                n_tanh.state[1] == n_tanh.v0
+            end
+        end
+
+        @testset "sigmoid" begin
+            sigmoid = nnsim.sigmoid()
+            @test sigmoid.state[1] == sigmoid.v0        # Constructor works
+
+            @test begin                         # Adding input to state without time evolution
+                update!(sigmoid, 1, 0, 0)
+                sigmoid.state[1] == 1. / (1. + exp(-1))
+            end
+
+            @test begin                         # Reset works
+                reset!(sigmoid)
+                sigmoid.state[1] == sigmoid.v0
+            end
+        end
     end
 
     @testset "Matrix Layer" begin
