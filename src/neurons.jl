@@ -224,3 +224,21 @@ end
 function reset!(neuron::ReLU)
     neuron.state .= [neuron.v0]
 end
+
+# tanh unit
+@with_kw struct tanh{F}<:AbstractNeuron
+    v0::F = 0.     # Reset voltage (mV)
+    state::Array{F,1} = [0.]     # Membrane potential (mV)
+end
+
+# tanh update function.  tanh is memoryless, so dt and t are not used.
+# They are left as parameters for the sake of interoperability with existing function calls
+function update!(neuron::tanh, input_update, dt, t)
+    # specify Base for the sake of avoiding namespace collisions
+    neuron.state[1] = Base.tanh(input_update)
+    return neuron.state[1]
+end
+
+function reset!(neuron::tanh)
+    neuron.state .= [neuron.v0]
+end
