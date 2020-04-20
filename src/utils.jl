@@ -35,7 +35,6 @@ function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dis
             W[Block(1,input_layer+1)] = rand!(init_dist, zeros(N_neurons,N_neurons))
         end
     end
-    println(input_layers)
     return Layer(neurons, W, input_layers)
 end
 
