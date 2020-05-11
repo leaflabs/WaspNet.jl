@@ -56,10 +56,12 @@ function update!(neuron::Izh, input_update, dt, t)
     neuron.state[1] += input_update
 
     # Euler method update
-    neuron.state[1] += dt*(
-      0.05 * neuron.state[1]^2 + 5*neuron.state[1] + 140 - neuron.state[2] + neuron.I
+    u1 = dt*(
+      0.04 * neuron.state[1]^2 + 5*neuron.state[1] + 140 - neuron.state[2] + neuron.I
       )
-    neuron.state[2] += dt*(neuron.a)*(neuron.b*neuron.state[1]-neuron.state[2])
+    u2 = dt*(neuron.a)*(neuron.b*neuron.state[1]-neuron.state[2])
+    neuron.state[1] += u1
+    neuron.state[2] += u2
 
     # Check for thresholding
     if neuron.state[1] >= neuron.θ
