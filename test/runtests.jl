@@ -236,6 +236,18 @@ using nnsim, BlockArrays, Test
                 reset!(net_hom)
                 all(nnsim.get_neuron_states(net_hom) .== v0)
             end
+
+            #### Test simulate! but with Matrix inputs)
+            reset!(net_hom)
+            outputs, states = simulate!(net_hom, zeros(N_in, 1000), 0.001, track_flag = true)
+            @test begin                         # Check neuron output matrix size
+                all(size(outputs) .== [2*N, 1001])
+            end
+
+            @test begin                         # Check neuron output matrix size
+                all(size(states) .== [2*N, 1001])
+            end
+
         end
 
     end
