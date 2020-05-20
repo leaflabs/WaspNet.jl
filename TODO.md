@@ -16,4 +16,6 @@
 - [X] Organize the `Layer` constructors better; agree on typical use case and write for that
 - [ ] Test all `Layer` method
 
+- [ ] Feed `Network` with a `Matrix` where each column is input at one time step
+- [ ] Fix Izhikevich time scales
 
