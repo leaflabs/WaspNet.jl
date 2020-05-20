@@ -13,6 +13,7 @@
 end
 
 function update!(neuron::Izh, input_update, dt, t)
+    dt *= 1000. # convert seconds to milliseconds for the Izh model
     retval = 0
     # If an impulse came in, add it
     neuron.state[1] += input_update

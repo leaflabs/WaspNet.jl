@@ -17,5 +17,7 @@
 - [ ] Test all `Layer` method
 
 - [ ] Feed `Network` with a `Matrix` where each column is input at one time step
-- [ ] Fix Izhikevich time scales
+- [X] Fix Izhikevich time scales
+
+- [X] Move neurons to be in their own source folders
 
