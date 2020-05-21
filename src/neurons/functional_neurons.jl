@@ -1,4 +1,6 @@
+##################################################################
 # ReLU unit
+##################################################################
 @with_kw struct ReLU{F}<:AbstractNeuron
     v0::F = 0.     # Reset voltage (mV)
     state::Array{F,1} = [0.]     # Membrane potential (mV)
@@ -16,7 +18,9 @@ function reset!(neuron::ReLU)
     neuron.state .= [neuron.v0]
 end
 
+##################################################################
 # tanh unit
+##################################################################
 @with_kw struct tanh{F}<:AbstractNeuron
     v0::F = 0.     # Reset voltage (mV)
     state::Array{F,1} = [0.]     # Membrane potential (mV)
@@ -34,7 +38,9 @@ function reset!(neuron::tanh)
     neuron.state .= [neuron.v0]
 end
 
+##################################################################
 # sigmoid unit
+##################################################################
 @with_kw struct sigmoid{F}<:AbstractNeuron
     v0::F = 0.     # Reset voltage (mV)
     state::Array{F,1} = [0.]     # Membrane potential (mV)
@@ -49,4 +55,22 @@ end
 
 function reset!(neuron::sigmoid)
     neuron.state .= [neuron.v0]
+end
+
+##################################################################
+# Identity unit (testing)
+##################################################################
+@with_kw struct identity{F}<:AbstractNeuron
+    state::Array{F,1} = [0.]    # Not *really* a stateful neuron, just passes its input forward
+end
+
+# Passes through its input value as an output
+function update!(neuron::identity, input_update, dt, t)
+    neuron.state[1] = input_update
+    return neuron.state[1]
+end
+
+# Only here because it's necessary for WaspNet
+function reset!(neuron::identity)
+    neuron.state .= [0.]
 end
