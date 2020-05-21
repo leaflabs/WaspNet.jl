@@ -94,5 +94,10 @@
             update!(id, 42., 0.001, 0.)
             id.state[1] == 42.
         end
+
+        @test begin
+            reset!(id)
+            id.state[1] == 0.
+        end
     end
 end

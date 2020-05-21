@@ -22,3 +22,8 @@
 
 - [X] Move neurons to be in their own source folders
 
+- [ ] Flip memory hierarchy with inner constructors
+	- [ ] Network inner constructor
+	- [ ] Layer inner constructor
+	- [ ] Retype *some* neurons to accept SubArrays
+
