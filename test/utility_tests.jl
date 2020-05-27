@@ -17,5 +17,6 @@
         all([n.v0 for n in b_layer.neurons] .== -40.)
     end
 
+    include("pruning_tests.jl")
 
 end
