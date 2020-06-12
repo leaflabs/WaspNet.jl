@@ -29,7 +29,7 @@
 	- [ ] LIF Neuron
 	- [ ] Functional neurons
 		- [ ] Functional refactor
-	- [ ] `Layer`
+	- [X] `Layer`
 	- [ ] `Network`
 	- [ ] Generic functions for docs (?)
 		- [X] Added `defs.jl` for abstract functions for documentation
