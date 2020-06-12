@@ -8,6 +8,7 @@ using Random
 using LinearAlgebra
 
 include("types.jl")
+include("defs.jl")
 include("neurons.jl")
 include("layer.jl")
 include("network.jl")
