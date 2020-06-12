@@ -1,6 +1,3 @@
-# For overloading purposes
-function update! end
-
 include("neurons/LIF.jl")
 include("neurons/Izh.jl")
 include("neurons/HH.jl")

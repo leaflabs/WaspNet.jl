@@ -28,10 +28,14 @@
 	- [ ] Izh Neuron
 	- [ ] LIF Neuron
 	- [ ] Functional neurons
-		- [ ] Functional refactor
+		- [X] Functional refactor
 	- [X] `Layer`
 	- [ ] `Network`
 	- [ ] Generic functions for docs (?)
 		- [X] Added `defs.jl` for abstract functions for documentation
+- [ ] Optimizations
+	- [ ] Do `Layer` updates in-place
+	- [ ] Do `Network` updates in-place
+	- [ ] Remove broadcasting in `Layer` and `Network` 
 - [ ] Simple example
 	- [ ] ???
