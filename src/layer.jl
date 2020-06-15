@@ -92,16 +92,19 @@ Not all arrays within `input` are used; we iterate over `l.conn` to select the a
 - `t`: the time at the start of the current time step
 """
 function update!(l::Layer{L,F,M}, input, dt, t) where {L,F, M<:AbstractBlockArray}
-    l.input .= 0 # reset the input vector to the layer
+    for j in 1:length(l.input) # reset the input vector to the layer
+        l.input[j] = 0
+    end
 
     for conn in l.conns
-        nonzero_input = !(all(input[conn+1] .== 0))
-        if nonzero_input
-            l.input .+= l.W[Block(1, conn+1)]*input[conn+1]
+        if any_nonzero(input[conn+1])
+            mul!(l.input, l.W[Block(1, conn+1)], input[conn+1], 1, 1)
         end
     end
 
-    l.output .= update!.(l.neurons, l.input, dt, t)
+    for j in 1:length(l.neurons)
+        l.output[j] = update!(l.neurons[j], l.input[j], dt, t)
+    end
     return l.output
 end
 
@@ -118,17 +121,18 @@ to a set of inputs from all `Network` layers in `input`.
 - `t`: the time at the start of the current time step
 """
 function update!(l::Layer{L,F,M}, input, dt, t) where {L, F, M<:Matrix}
-    if isempty(l.conns) && !(all(input[1] .== 0))
-        l.input .= l.W*input[1]
+    if isempty(l.conns) && any_nonzero(input[1])
+        mul!(l.input, l.W, input[1])
     elseif !isempty(l.conns)
         conn = l.conns[1] # should only have one connection
-        nonzero_input = !(all(input[conn+1] .== 0))
-        if nonzero_input
-            l.input .= l.W*input[conn+1]
+        if any_nonzero(input[conn+1])
+            mul!(l.input, l.W, input[conn+1])
         end
     end
 
-    l.output .= update!.(l.neurons, l.input, dt, t)
+    for j in 1:length(l.neurons)
+        l.output[j] = update!(l.neurons[j], l.input[j], dt, t)
+    end
     return l.output
 end
 

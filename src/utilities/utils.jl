@@ -49,3 +49,7 @@ function network_constructor(N_layers, N_neurons; n_constr = nnsim.Izh, connecti
     end
     return Network(layers)
 end
+
+function any_nonzero(A)
+    return any((x) -> (x != 0), A)
+end

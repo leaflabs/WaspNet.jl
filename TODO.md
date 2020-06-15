@@ -25,17 +25,26 @@
 ====================================================================================================
 
 - [ ] Docstrings
-	- [ ] Izh Neuron
-	- [ ] LIF Neuron
-	- [ ] Functional neurons
+	- [X] Izh Neuron
+	- [X] LIF Neuron
+	- [X] Functional neurons
 		- [X] Functional refactor
 	- [X] `Layer`
 	- [ ] `Network`
 	- [ ] Generic functions for docs (?)
 		- [X] Added `defs.jl` for abstract functions for documentation
 - [ ] Optimizations
-	- [ ] Do `Layer` updates in-place
+	- [X] Do `Layer` updates in-place
 	- [ ] Do `Network` updates in-place
-	- [ ] Remove broadcasting in `Layer` and `Network` 
+	- [ ] Remove broadcasting in `Layer` and `Network`
+	- [ ] Maybe change `Network.prev_outputs` to a `BlockArray`, this Vector-of-Vector business is questionable
 - [ ] Simple example
 	- [ ] ???
+- [ ] Review tests for relevance
+
+====================================================================================================
+
+- [ ] Move simulation to something outside of the `Network`
+	- [ ] Remove `neur_states`, `neur_outputs` from `Network` (leverage the `prev_outputs` fields heavily here)
+	- [ ] New `NetworkSimOutput` type which holds the results, manages time, maybe useful for plotting
+	- [ ] Make sure all of the `Network` tests are still passing

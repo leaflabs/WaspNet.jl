@@ -1,6 +1,21 @@
 
 # A Network comprises layers and handles passing inputs between layers. Furthemore,
 #   it also tracks the states of all of the neurons at each time step.
+"""
+    mutable struct Network<:AbstractNetwork
+
+Contains constituent `Layer`s, orchestrates the movement of signals between `Layer`s, and handles first-layer input.
+
+# Fields
+- `layers::Array{AbstractLayer,1}`: Array of `Layer`s ordered from 1 to N for N layers
+- `N_in::Int`: Number of input dimensions to the first `Layer`
+- `N_out::Int`: Number of output dimensions from the final `Layer`
+- `neur_states::Matrix`: TODO: This will hopefully be deprecated soon 
+- `neur_outputs::Matrix`: TODO: This will hopefully be deprecated soon 
+- `state_size::Int`: TODO: This will hopefully be deprecated soon; it's used for pre-allocating `neur_states`
+- `t`: TODO: This will hopefully be deprecated soon; internal time parameter for simulations
+- `prev_outputs::Vector`: Vector of vectors sized to hold the output from each `Layer` 
+"""
 mutable struct Network<:AbstractNetwork
     layers::Array{AbstractLayer, 1}  # Array of layers in order from input to output
     N_in::Int                          # Number of input dimensions
