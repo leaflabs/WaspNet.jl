@@ -12,6 +12,7 @@ include("defs.jl")
 include("neurons.jl")
 include("layer.jl")
 include("network.jl")
+include("simulate.jl")
 include("utils.jl")
 
 export NetworkElement, AbstractNetwork, AbstractNeuron, AbstractLayer
