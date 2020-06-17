@@ -82,16 +82,16 @@
 
     @testset "Network Pruning" begin
         N1 = [nnsim.LIF() for _ in 1:5]
-        W10 = reshape(collect(1:20), (5,4))
-        W11 = reshape(collect(1:25), (5,5))
-        W12 = reshape(collect(1:30), (5,6))
+        W10 = reshape(collect(1:20)*1., (5,4))
+        W11 = reshape(collect(1:25)*1., (5,5))
+        W12 = reshape(collect(1:30)*1., (5,6))
         W1 = BlockArray(hcat(W10, W11, W12), [5],[4,5,6])
         L1 = Layer(N1, W1, [0, 1, 2])
 
         N2 = [nnsim.LIF() for _ in 1:6]
-        W20 = reshape(collect(1:24), (6,4))
-        W21 = reshape(collect(1:30), (6,5))
-        W22 = reshape(collect(1:36), (6,6))
+        W20 = reshape(collect(1:24)*1., (6,4))
+        W21 = reshape(collect(1:30)*1., (6,5))
+        W22 = reshape(collect(1:36)*1., (6,6))
         W2 = BlockArray(hcat(W20, W21, W22), [6], [4,5,6])
         L2 = Layer(N2, W2, [0,1,2])
 

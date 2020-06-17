@@ -1,8 +1,8 @@
 # Prunes a given Layer l which is located at index l_idx in the layers and neurons arrays
 # length(layers) = length(neurons), each entry in the latter corresponds to neurons from 
 # the respective layer in the former.
-function prune(l::Layer{L,F,M}, l_idx::Int, layers::Array{Int,1}, neurons::Array{Array{Int,1},1}
-    ) where {L,F, M<:Matrix}
+function prune(l::Layer{L,N,A,M}, l_idx::Int, layers::Array{Int,1}, neurons::Array{Array{Int,1},1}
+    ) where {L,N,A, M<:Matrix}
     new_neurons = l.neurons
     new_W = l.W
     new_conns = l.conns
@@ -22,8 +22,8 @@ function prune(l::Layer{L,F,M}, l_idx::Int, layers::Array{Int,1}, neurons::Array
     return Layer(new_neurons, new_W, new_conns)
 end
 
-function prune(l::Layer{L,F,M}, l_idx::Int, layers::Array{Int,1}, neurons::Array{Array{Int,1},1}
-    ) where {L,F, M<:BlockArray}
+function prune(l::Layer{L,N,A,M}, l_idx::Int, layers::Array{Int,1}, neurons::Array{Array{Int,1},1}
+    ) where {L,N,A, M<:BlockArray}
     new_neurons = l.neurons
     new_W = l.W
     new_conns = l.conns
