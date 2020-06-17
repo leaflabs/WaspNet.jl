@@ -1,29 +1,29 @@
 """
-    struct Izh{F}<:AbstractNeuron
+    struct Izh{T<:Number, A<:AbstractArray{T,1}}<:AbstractNeuronn
 
 Contains the vector of paramters [a, b, c, d, I, θ] necessary to simulate an Izhikevich neuron as well as the current state of the neuron.
 
 The @with_kw macro is used to produce a constructor which accepts keyword arguments for all values. This neuron struct is immutable, therefor we store the state of the neuron in an `Array` such that its values can change while the parameters remain static. This represents a minimal example for an `AbstractNeuron` implementation to build it into a `Layer`.
 
 # Fields
-- `a::F`-`d::F`: Neuron parameters as described at https://www.izhikevich.org/publications/spikes.htm
-- `I::F`: Background current (mA)
-- `θ::F`: Threshold potential (mV)
-- `v0::F`: Reset voltage (mV)
-- `u0::F`: Reset recovery variable value
-- `state::Array{F,1}`: Vector holding the current (v,u) state of the neuron
+- `a::T`-`d::T`: Neuron parameters as described at https://www.izhikevich.org/publications/spikes.htm
+- `I::T`: Background current (mA)
+- `θ::T`: Threshold potential (mV)
+- `v0::T`: Reset voltage (mV)
+- `u0::T`: Reset recovery variable value
+- `state::A`: Vector holding the current (v,u) state of the neuron
 """
-@with_kw struct Izh{F}<:AbstractNeuron
-    a::F = 0.02      
-    b::F = 0.2
-    c::F = -65.
-    d::F = 8.
-    I::F = 25.       
-    θ::F = 30.       
+@with_kw struct Izh{T<:Number, A<:AbstractArray{T,1}}<:AbstractNeuron
+    a::T = 0.02      
+    b::T = 0.2
+    c::T = -65.
+    d::T = 8.
+    I::T = 25.       
+    θ::T = 30.       
 
-    v0::F = -65.     # Reset voltage (mV)
-    u0::F = 0.       # Reset state variable
-    state::Array{F,1} = [-65., 0.]      # Membrane potential (mV) and state variable
+    v0::T = -65.     # Reset voltage (mV)
+    u0::T = 0.       # Reset state variable
+    state::A = [-65., 0.]      # Membrane potential (mV) and state variable
 end
 
 """

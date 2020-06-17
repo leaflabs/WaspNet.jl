@@ -1,24 +1,24 @@
 """
-    struct LIF{F}<:AbstractNeuron
+    LIF{T<:Number,A<:AbstractArray{T, 1}}<:AbstractNeuron 
 
 Contains the necessary parameters for describing a Leaky Integrate-and-Fire (LIF) neuron as well as the current membrane potential of the neuron.
 
 # Fields
-- `τ::F`: Neuron time constant (ms)
-- `R::F`: Neuronal model resistor (kOhms)
-- `θ::F`: Threshold voltage (mV)
-- `I::F`: Background current injection (mV)
-- `v0::F`: Reset voltage (mV)
-- `state::Array{F,1}`: Current membrane potential (mV)
+- `τ::T`: Neuron time constant (ms)
+- `R::T`: Neuronal model resistor (kOhms)
+- `θ::T`: Threshold voltage (mV)
+- `I::T`: Background current injection (mV)
+- `v0::T`: Reset voltage (mV)
+- `state::A`: Current membrane potential (mV)
 """
-@with_kw struct LIF{F}<:AbstractNeuron
-    τ::F = 8.         
-    R::F = 10.E3      
-    θ::F = 30.      
-    I::F = 40.      
+@with_kw struct LIF{T<:Number,A<:AbstractArray{T, 1}}<:AbstractNeuron 
+    τ::T = 8.         
+    R::T = 10.E3      
+    θ::T = 30.      
+    I::T = 40.      
 
-    v0::F = -55.     
-    state::Array{F,1} = [-55.]     
+    v0::T = -55.     
+    state::A = [-55.]     
 end
 
 
