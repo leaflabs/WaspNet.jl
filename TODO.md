@@ -43,7 +43,7 @@
 - [ ] Review tests for relevance
 - [ ] Re-type to <:AbstractArray{T,dims} 
 	- [X] LIF, Izh, Functional
-	- [ ] Layer
+	- [X] Layer
 	- [ ] Network
 
 ====================================================================================================
