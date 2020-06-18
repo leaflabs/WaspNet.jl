@@ -33,11 +33,10 @@
 	- [ ] `Network`
 	- [ ] Generic functions for docs (?)
 		- [X] Added `defs.jl` for abstract functions for documentation
-- [ ] Optimizations
+- [X] Optimizations
 	- [X] Do `Layer` updates in-place
-	- [ ] Do `Network` updates in-place
-	- [ ] Remove broadcasting in `Layer` and `Network`
-	- [ ] Maybe change `Network.prev_outputs` to a `BlockArray`, this Vector-of-Vector business is questionable
+	- [X] Do `Network` updates in-place
+	- [X] Remove broadcasting in `Layer` and `Network`
 - [ ] Simple example
 	- [ ] ???
 - [ ] Review tests for relevance
@@ -49,6 +48,6 @@
 ====================================================================================================
 
 - [ ] Move simulation to something outside of the `Network`
-	- [ ] Remove `neur_states`, `neur_outputs` from `Network` (leverage the `prev_outputs` fields heavily here)
+	- [X] Remove `neur_states`, `neur_outputs` from `Network` (leverage the `prev_outputs` fields heavily here)
 	- [ ] New `NetworkSimOutput` type which holds the results, manages time, maybe useful for plotting
 	- [ ] Make sure all of the `Network` tests are still passing

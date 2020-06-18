@@ -43,7 +43,7 @@ function Layer(
 end
 
 """
-    Layer(neurons, W::Matrix)
+    Layer(neurons, W)
 
 Constructs a `Layer` with constituent `neurons` which accept a feed-forward input with a matrix of weights `W` 
 """
