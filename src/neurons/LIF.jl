@@ -18,7 +18,8 @@ Contains the necessary parameters for describing a Leaky Integrate-and-Fire (LIF
     I::T = 40.      
 
     v0::T = -55.     
-    state::A = [-55.]     
+    state::A = [-55.]
+    output::A = [0.]     
 end
 
 
@@ -29,7 +30,7 @@ end
 Evolve and `LIF` neuron subject to a membrane potential step of size `input_update` a time duration `dt` starting from time `t`
 """
 function update!(neuron::LIF, input_update, dt, t)
-    retval = 0
+    neuron.output[1] = 0
     # If an impulse came in, add it
     neuron.state[1] += input_update
 
@@ -39,10 +40,10 @@ function update!(neuron::LIF, input_update, dt, t)
     # Check for thresholding
     if neuron.state[1] >= neuron.θ
         neuron.state[1] = neuron.v0
-        retval = 1 # Binary output
+        neuron.output[1] = 1 # Binary output
     end
 
-    return retval
+    return neuron.output[1] 
 end
 
 function reset!(neuron::LIF)

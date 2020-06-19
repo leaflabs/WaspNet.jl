@@ -162,3 +162,12 @@ Return the current output of `l`'s constituent neurons
 function get_neuron_outputs(l::AbstractLayer)
     return l.output
 end
+
+"""
+    get_neuron_count(l::AbstractLayer)
+
+Return the number of neurons in the given `Layer`
+"""
+function get_neuron_count(l::AbstractLayer)
+    return length(l.neurons)
+end

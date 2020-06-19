@@ -15,8 +15,8 @@ include("network.jl")
 include("simulate.jl")
 include("utils.jl")
 
-export NetworkElement, AbstractNetwork, AbstractNeuron, AbstractLayer
-export Layer, Network
+export WaspnetElement, AbstractNetwork, AbstractNeuron, AbstractLayer
+export Layer, Network, SimulationResult
 export update!, reset!, simulate!
 
 export batch_layer_construction, network_constructor, layer_constructor, feed_forward_network

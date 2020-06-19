@@ -1,60 +1,106 @@
 """
     struct SimulationResult{
-        NT<:Network, OT<:AbstractArray{<:Number,2}, ST<:AbstractArray{<:Number, 2}, TT<:AbstractArray{<:Real,1}
+        OT<:AbstractArray{<:Number,2}, ST<:AbstractArray{<:Number, 2}, TT<:AbstractArray{<:Real,1}
         }<:AbstractSimulation   
 
-Contains simulation results from simulating a `Network` for a specific length of time with `simulate!`.
+Contains simulation results from simulating a `Network` for a specific length of time with `simulate!`
+
+# Fields
+- `outputs::OT`: A `Matrix` containing the output of all simulated neurons at every time step.
+- `states::ST`: A `Matrix` containing the state of all simulated neurons at every time step. If states were not tracked, an Nx0 dimensional `Matrix`.
+- `times::TT`: An `Array` of times at which the `WaspnetElement` was sampled.
 """
 struct SimulationResult{
-    NT<:Network, OT<:AbstractArray{<:Number,2}, ST<:AbstractArray{<:Number, 2}, TT<:AbstractArray{<:Real,1}
+    OT<:AbstractArray{<:Number,2}, ST<:AbstractArray{<:Number, 2}, TT<:AbstractArray{<:Real,1}, EL<:WaspnetElement
     }<:AbstractSimulation
-    network::NT
-    neuron_outputs::OT
-    neuron_states::ST
-    times::TT
+    outputs::OT
+    states::ST
+    times::TT 
+
+    function SimulationResult{OT,ST,TT,EL}(outputs::OT, states::ST, times::TT) where {
+        OT<:AbstractArray{<:Number,2}, ST<:AbstractArray{<:Number,2}, TT<:AbstractArray{<:Real, 1}, EL<:WaspnetElement
+        }
+        return new{OT,ST,TT,EL}(outputs, states, times)
+    end
 end
 
-# Simulate the network from `t0` to `tf` with a time step of `dt` with an input to
-#   the first layer of `input`
-function simulate!(network::Network, input::Function, dt, tf, t0 = 0.; track_state=false, kwargs...)
-    # t_steps are time points where we evaluate the input function
-    # There are ((tf-t0)/dt)+1 time steps, including t0 as the first time step
-    # Thus, we evolve the network assuming it is evaluated at the initial time step for
-    # every time step, meaning the network ends with t=tf but the last evaluation of input
-    # happens at time t=tf-dt
+function SimulationResult(element::EL, times::TT) where {EL<:WaspnetElement,TT<:AbstractArray{<:Real, 1}}
+    cols = length(times) + 1
+    outputs_proto = get_neuron_outputs(element)
+    state_proto = get_neuron_states(element)
+
+    n_out = length(outputs_proto)
+    n_state = length(state_proto)
+    zero_out = zero(outputs_proto[1])
+    zero_state = zero(state_proto[1])
+
+    outputs = fill(zero_out, n_out, cols)
+    states = fill(zero_state, n_state, cols)
+    return SimulationResult(outputs, states, times, element)
+end
+
+function SimulationResult(outputs::OT,states::ST,times::TT, element::EL) where {
+    OT<:AbstractArray{<:Number,2}, ST<:AbstractArray{<:Number,2}, TT<:AbstractArray{<:Real, 1}, EL<:WaspnetElement
+    }
+    return SimulationResult{OT,ST,TT,EL}(outputs, states, times)
+end
+
+"""
+    simulate!(element::WaspnetElement, input::Function, dt, tf, t0 = 0.; track_state=false, kwargs...)
+
+Simulates the supplied `WaspnetElement` subject to a function of time, `input` by sampling `input` at the chosen sample times and returns the relevant `SimulationResult` instance
+"""
+function simulate!(element::WaspnetElement, input::Function, dt, tf, t0 = 0.; track_state=false, kwargs...)
     t_steps = t0:dt:(tf-dt)
    
     input_matrix = hcat(input.(t_steps)...) 
-    return simulate!(network, input_matrix, dt, t0, track_flag = track_flag)
+    return simulate!(element, input_matrix, dt, tf, t0, track_state = track_state)
 end
 
-function simulate!(network::Network, input::Matrix, dt, t0 = 0.; track_state=false, kwargs...)
+"""
+    simulate!(element::WaspnetElement, input::Matrix, dt, tf, t0 = 0.; track_state=false, kwargs...)
+
+Simulates the supplied `WaspnetElement` subject to some pre-sampled `input` where each column is one time step and returns the relevant `SimulationResult` instance
+"""
+function simulate!(element::WaspnetElement, input::Matrix, dt, tf, t0 = 0.; track_state=false, kwargs...)
+    t_steps = t0:dt:(tf-dt)
     t = t0
-    N_steps = size(input)[2]
+    N_steps = length(t_steps)
+
+    result = SimulationResult(element, t_steps)
 
     # The +1 here is to ensure that we get the initial state at t=t0 in the outputs
-    network.neur_outputs = Array{Any, 2}(undef, get_neuron_count(network), N_steps+1) 
-    network.neur_outputs[:, 1] = get_neuron_outputs(network) 
-    if track_flag
-        network.neur_states = Array{Any, 2}(undef, network.state_size, N_steps+1)
-        network.neur_states[:,1] .= get_neuron_states(network)
+    result.outputs[:,1] .= get_neuron_outputs(element)
+    if track_state
+        result.states[:,1] .= get_neuron_states(element)
     end
 
     for i in 1:N_steps
-        update!(network, input[:,i], dt, t)
+        sim_update!(element, input[:,i], dt, t)
         # The +1 here is the offset from including the initial values in the outputs
-        network.neur_outputs[:, i+1] = get_neuron_outputs(network)
-        if track_flag
-            network.neur_states[:,i+1] .= get_neuron_states(network)
+        result.outputs[:, i+1] .= get_neuron_outputs(element)
+        if track_state
+            result.states[:,i+1] .= get_neuron_states(element)
         end
         t += dt
-        network.t += dt
     end
+    return result
+end
 
-    if track_flag
-        return network.neur_outputs, network.neur_states
-    else
-        return network.neur_outputs
-    end 
+"""
+    function sim_update!(ne::WaspnetElement, input_update, dt, t)
 
+Generic function for wrapping calls to `update!` from `simulate!`
+"""
+function sim_update!(ne::WaspnetElement, input_update, dt, t)
+    update!(ne, input_update, dt, t)
+end
+
+"""
+    function sim_update!(neuron::AbstractNeuron, input_update<:AbstractArray{T,N}, dt, t) where {T<:Number, N}
+
+Wrapper to ensure that if a 1D array is passed to update a neuron, it is converted to a scalar first
+"""
+function sim_update!(neuron::AbstractNeuron, input_update::AbstractArray{T,N}, dt, t) where {T<:Number, N}
+    return update!(neuron, input_update[1], dt, t)
 end

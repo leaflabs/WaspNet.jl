@@ -1,5 +1,5 @@
 # Abstract type for all nnsim.jl types.
-abstract type WaspNetElement end
+abstract type WaspnetElement end
 
 """
 	abstract type AbstractNeuron <: WaspNetElement
@@ -9,13 +9,13 @@ must be stored in a field named `state`, but otherwise there are no restrictions
 
 For help, see the `nnsim.Izh` docstring and example.
 """	
-abstract type AbstractNeuron <: WaspNetElement end
+abstract type AbstractNeuron <: WaspnetElement end
 
 # Abstract type for layers
-abstract type AbstractLayer <: WaspNetElement end
+abstract type AbstractLayer <: WaspnetElement end
 
 # Abstract type for networks
-abstract type AbstractNetwork <: WaspNetElement end
+abstract type AbstractNetwork <: WaspnetElement end
 
 # Abstract type for simulations
-abstract type AbstractSimulation <: WaspNetElement end
+abstract type AbstractSimulation <: WaspnetElement end

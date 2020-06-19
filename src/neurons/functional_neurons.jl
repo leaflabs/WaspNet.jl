@@ -20,6 +20,10 @@ function reset!(neuron::Functional)
     neuron.state[1] = 0
 end
 
+function get_neuron_outputs(n::Functional{T,A,F}) where {T,A,F}
+    return neuron.state[1]
+end
+
 function Functional(f::F; state::A = [0.]) where {T<:Number, A<:AbstractArray{T,1}, F<:Function}
     return Functional{T,A,F}(f, state)
 end 

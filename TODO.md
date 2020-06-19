@@ -40,14 +40,14 @@
 - [ ] Simple example
 	- [ ] ???
 - [ ] Review tests for relevance
-- [ ] Re-type to <:AbstractArray{T,dims} 
+- [X] Re-type to <:AbstractArray{T,dims} 
 	- [X] LIF, Izh, Functional
 	- [X] Layer
-	- [ ] Network
+	- [X] Network
 
 ====================================================================================================
 
-- [ ] Move simulation to something outside of the `Network`
+- [X] Move simulation to something outside of the `Network`
 	- [X] Remove `neur_states`, `neur_outputs` from `Network` (leverage the `prev_outputs` fields heavily here)
-	- [ ] New `NetworkSimOutput` type which holds the results, manages time, maybe useful for plotting
-	- [ ] Make sure all of the `Network` tests are still passing
+	- [X] New `NetworkSimOutput` type which holds the results, manages time, maybe useful for plotting
+	- [X] Make sure all of the `Network` tests are still passing

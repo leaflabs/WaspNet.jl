@@ -24,6 +24,7 @@ The @with_kw macro is used to produce a constructor which accepts keyword argume
     v0::T = -65.     # Reset voltage (mV)
     u0::T = 0.       # Reset state variable
     state::A = [-65., 0.]      # Membrane potential (mV) and state variable
+    output::A = [0.]
 end
 
 """
@@ -35,7 +36,7 @@ We use an Euler update for solving the set of differential equations for its com
 """
 function update!(neuron::Izh, input_update, dt, t)
     dt *= 1000. # convert seconds to milliseconds for the Izh model
-    retval = 0
+    neuron.output[1] = 0
     # If an impulse came in, add it
     neuron.state[1] += input_update
 
@@ -51,10 +52,10 @@ function update!(neuron::Izh, input_update, dt, t)
     if neuron.state[1] >= neuron.θ
         neuron.state[1] = neuron.v0
         neuron.state[2] = neuron.state[2] + neuron.d
-        retval = 1
+        neuron.output[1] = 1
     end
 
-    return retval
+    return neuron.output[1]
 end
 
 """
