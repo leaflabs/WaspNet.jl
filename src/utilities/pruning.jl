@@ -65,7 +65,7 @@ function prune(net::Network, layers, neurons)
     old_layers = net.layers
     new_layers = Array{AbstractLayer, 1}()
     for (l_idx,l) in enumerate(old_layers)
-        push!(new_layers, prune(l, l_idx, layers, neurons))
+        push!(new_layers, prune(l, layers, neurons, l_idx))
     end
     new_net = Network(new_layers, net.N_in)
     return new_net

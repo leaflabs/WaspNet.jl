@@ -47,7 +47,7 @@
         layers = [1,2,3,4]
         prune_neurons = [[2,4], [1,2], [1,3,5], [7, 18]]
 
-        L2 = nnsim.prune(L, l_idx, layers, prune_neurons)
+        L2 = nnsim.prune(L, layers, prune_neurons, l_idx)
         @test begin
             length(L2.neurons) == 3
         end
@@ -64,7 +64,7 @@
         l_idx = 1
         layers = [1,2,3]
         prune_neurons = [[2,4], [1], [2]]
-        L2 = nnsim.prune(L, l_idx, layers, prune_neurons)
+        L2 = nnsim.prune(L, layers, prune_neurons, l_idx)
         @test begin
             length(L2.neurons) == 3    
         end
