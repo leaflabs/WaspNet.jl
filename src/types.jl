@@ -1,4 +1,3 @@
-# Abstract type for all nnsim.jl types.
 abstract type WaspnetElement end
 
 """
@@ -11,11 +10,8 @@ For help, see the `nnsim.Izh` docstring and example.
 """	
 abstract type AbstractNeuron <: WaspnetElement end
 
-# Abstract type for layers
 abstract type AbstractLayer <: WaspnetElement end
 
-# Abstract type for networks
 abstract type AbstractNetwork <: WaspnetElement end
 
-# Abstract type for simulations
 abstract type AbstractSimulation <: WaspnetElement end

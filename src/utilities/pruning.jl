@@ -1,8 +1,19 @@
-# Prunes a given Layer l which is located at index l_idx in the layers and neurons arrays
-# length(layers) = length(neurons), each entry in the latter corresponds to neurons from 
-# the respective layer in the former.
-function prune(l::Layer{L,N,A,M}, l_idx::Int, layers::Array{Int,1}, neurons::Array{Array{Int,1},1}
-    ) where {L,N,A, M<:Matrix}
+"""
+    function prune(el::WaspnetElement, layers, neurons[, l_idx])
+
+Given an element `el` along with indices for target `Neuron`s, constructs new `Layer`s and `Network`s with all references to those neurons removed by deleting rows and columns from the proper weight matrices in each `Layer`.
+
+`layers` should be an array of indices relative to the `Network` it is being pruned in; `neurons` should be an array of arrays of indices where the entries in each inner array are indices of neurons within the respective `Layer` from `layers`.
+
+# Arguments
+-`el::WaspnetElement`: The element to prune neurons from, either a `Network` or `Layer`
+-`layers`: A list of indices for which `Layer`s we're removing neurons from the `Network` where it resides
+-`neurons`: A list of lists of neurons to remove in the respective entries from `layers`.
+-`l_idx`: If `prune` is called on a `Layer`, `l_idx` denotes the index of the that `Layer` if it were to appear in the list `layers`
+"""
+function prune(el::WaspnetElement, layers, neurons) end
+
+function prune(l::Layer{L,N,A,M}, layers, neurons, l_idx) where {L,N,A,M}
     new_neurons = l.neurons
     new_W = l.W
     new_conns = l.conns
@@ -22,8 +33,7 @@ function prune(l::Layer{L,N,A,M}, l_idx::Int, layers::Array{Int,1}, neurons::Arr
     return Layer(new_neurons, new_W, new_conns)
 end
 
-function prune(l::Layer{L,N,A,M}, l_idx::Int, layers::Array{Int,1}, neurons::Array{Array{Int,1},1}
-    ) where {L,N,A, M<:BlockArray}
+function prune(l::Layer{L,N,A,M}, layers, neurons, l_idx) where {L,N,A, M<:BlockArray}
     new_neurons = l.neurons
     new_W = l.W
     new_conns = l.conns
@@ -51,7 +61,7 @@ function prune(l::Layer{L,N,A,M}, l_idx::Int, layers::Array{Int,1}, neurons::Arr
     return Layer(new_neurons, new_W, new_conns)
 end
 
-function prune(net::Network, layers::Array{Int,1}, neurons::Array{Array{Int, 1}, 1})
+function prune(net::Network, layers, neurons)
     old_layers = net.layers
     new_layers = Array{AbstractLayer, 1}()
     for (l_idx,l) in enumerate(old_layers)
@@ -61,11 +71,23 @@ function prune(net::Network, layers::Array{Int,1}, neurons::Array{Array{Int, 1},
     return new_net
 end
 
-# Removes the entries along the specified axis from the given BlockArray, maintaining the
-#   sizes of all unaffected blocks and contracting the sizes of the affected blocks.
-# e.g. removing the 3rd row from a 5x5 matrix
-function delete_entries(W::BlockArray, entries::Array{Int,1}; axis::Int = 1)
-    # Delete the rows from the BlockArray and store this in a new array
+"""
+    function delete_entries(W, entries; axis::Int = 1)
+
+Given an `AbstractArray`, deletes the specified `entries` (e.g. rows or columns) along the given axis; used for pruning weight matrices. 
+
+As an example, `delete_entries(W, [3,4]; axis = 2)` would delete columns 3 and 4 from `W` and return the modified `W`.
+"""
+function delete_entries(W, entries; axis = 1) end
+
+function delete_entries(W::AbstractArray{T,N}, entries; axis = 1) where {T<:Number,N}
+    # Get all the axes, then remove the proper entries by index
+    remaining_entries = Array{Any}(collect(axes(W) ))
+    remaining_entries[axis] = setdiff(remaining_entries[axis], entries) 
+    return W[remaining_entries...]
+end
+
+function delete_entries(W::AbstractBlockArray, entries; axis::Int = 1)
     # First we get all the axes of the BlockArray, then remove the proper entries by index
     remaining_entries = Array{Any}(collect(axes(W) ))
     remaining_entries[axis] = setdiff(remaining_entries[axis], entries) 
@@ -84,6 +106,7 @@ function delete_entries(W::BlockArray, entries::Array{Int,1}; axis::Int = 1)
     idx_0 = 1
     for idx_f in item_idxs
         # Count how many of the remaining entries are in the current idx range for this block
+        #       There's probably an algorithm to do this efficiently, but I don't think that's necessary rn
         n_in_block = count([n in idx_0:idx_f for n in remaining_entries[axis]])
         push!(new_item_sizes, n_in_block) 
         idx_0 = idx_f + 1
@@ -92,11 +115,3 @@ function delete_entries(W::BlockArray, entries::Array{Int,1}; axis::Int = 1)
 
     return BlockArray(new_array, block_lengths...)
 end
-
-function delete_entries(W::Matrix, entries::Array{Int, 1}; axis::Int = 1)
-    remaining_entries = Array{Any}(collect(axes(W) ))
-    remaining_entries[axis] = setdiff(remaining_entries[axis], entries) 
-    return W[remaining_entries...]
-
-end
-

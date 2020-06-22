@@ -22,8 +22,6 @@ Contains the necessary parameters for describing a Leaky Integrate-and-Fire (LIF
     output::A = [0.]     
 end
 
-
-# LIF time evolution step, using Euler method to ensure uniform time steps
 """
     update!(neuron::LIF, input_update, dt, t)
 

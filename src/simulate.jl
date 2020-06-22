@@ -24,6 +24,11 @@ struct SimulationResult{
     end
 end
 
+"""
+    SimulationResult(element::EL, times::TT) where {EL<:WaspnetElement,TT<:AbstractArray{<:Real, 1}}
+
+Given a `WaspnetElement` and the times at which to simulate the element, construct the `SimulationResult` instance to store the results of the simulation. 
+""" 
 function SimulationResult(element::EL, times::TT) where {EL<:WaspnetElement,TT<:AbstractArray{<:Real, 1}}
     cols = length(times) + 1
     outputs_proto = get_neuron_outputs(element)
