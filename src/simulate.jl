@@ -30,7 +30,7 @@ end
 Given a `WaspnetElement` and the times at which to simulate the element, construct the `SimulationResult` instance to store the results of the simulation. 
 """ 
 function SimulationResult(element::EL, times::TT) where {EL<:WaspnetElement,TT<:AbstractArray{<:Real, 1}}
-    cols = length(times) + 1
+    cols = length(times) 
     outputs_proto = get_neuron_outputs(element)
     state_proto = get_neuron_states(element)
 
@@ -56,9 +56,9 @@ end
 Simulates the supplied `WaspnetElement` subject to a function of time, `input` by sampling `input` at the chosen sample times and returns the relevant `SimulationResult` instance
 """
 function simulate!(element::WaspnetElement, input::Function, dt, tf, t0 = 0.; track_state=false, kwargs...)
-    t_steps = t0:dt:(tf-dt)
+    t_steps = t0:dt:tf
    
-    input_matrix = hcat(input.(t_steps)...) 
+    input_matrix = hcat(input.(t_steps[1:(end-1)])...) 
     return simulate!(element, input_matrix, dt, tf, t0, track_state = track_state)
 end
 
@@ -68,9 +68,9 @@ end
 Simulates the supplied `WaspnetElement` subject to some pre-sampled `input` where each column is one time step and returns the relevant `SimulationResult` instance
 """
 function simulate!(element::WaspnetElement, input::Matrix, dt, tf, t0 = 0.; track_state=false, kwargs...)
-    t_steps = t0:dt:(tf-dt)
+    t_steps = t0:dt:tf
     t = t0
-    N_steps = length(t_steps)
+    N_steps = length(t_steps) - 1
 
     result = SimulationResult(element, t_steps)
 

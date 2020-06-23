@@ -12,6 +12,7 @@ The @with_kw macro is used to produce a constructor which accepts keyword argume
 - `v0::T`: Reset voltage (mV)
 - `u0::T`: Reset recovery variable value
 - `state::A`: Vector holding the current (v,u) state of the neuron
+- `output::A`: Vector holding the current output of the neuron
 """
 @with_kw struct Izh{T<:Number, A<:AbstractArray{T,1}}<:AbstractNeuron
     a::T = 0.02      

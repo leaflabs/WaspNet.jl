@@ -2,6 +2,13 @@
     Layer{L<:AbstractNeuron, N<:Number, A<:AbstractArray{N,1}, M<:AbstractArray{N,2}}<:AbstractLayer
 
 Track a population of neurons of one `AbstractNeuron` type, the other `Layer`s those neurons are connected to, and the incoming weights. 
+
+# Fields
+- `neurons::Array{L,1}`: an array of neurons for the `Layer`
+- `W<:Union{Matrix,AbstractBlockArray}`: either a Matrix or BlockArray containing weights for inputs from incoming layers
+- `conns`: either `[]` or `Array{Int,1}` indicating which `Layer`s in the `Network` are connected as inputs to this `Layer`
+- `input::Array{N,1}`: a pre-allocated array of zeros for staging inputs to the layer
+- `output::Array{N,1}`: a pre-allocated array for staging outputs from this layer
 """
 struct Layer{L<:AbstractNeuron, N<:Number, A<:AbstractArray{N,1}, M<:AbstractArray{N,2}}<:AbstractLayer
     neurons::Array{L,1}
@@ -24,13 +31,6 @@ end
     Layer(neurons, W, conns, N_neurons, input, output)
 
 Default non-parametric constructor for `Layer`s for pre-processing inputs and computing parametric types.
-
-# Arguments
-- `neurons::Array{L,1}`: an array of neurons for the `Layer`
-- `W<:Union{Matrix,AbstractBlockArray}`: either a Matrix or BlockArray containing weights for inputs from incoming layers
-- `conns`: either `[]` or `Array{Int,1}` indicating which `Layer`s in the `Network` are connected as inputs to this `Layer`
-- `input::Array{N,1}`: a pre-allocated array of zeros for staging inputs to the layer
-- `output::Array{N,1}`: a pre-allocated array for staging outputs from this layer
 """
 function Layer(
     neurons::Array{L,1}, W::M, conns::Array{J,1}, N_neurons::Int, input::A, output::A
@@ -129,7 +129,6 @@ function update!(l::Layer{L,N,A,M}, input, dt, t) where {L,N,A,M<:AbstractBlockA
             mul!(l.input, l.W[Block(1, conn+1)], input[conn+1], 1, 1)
         end
     end
-
     for j in 1:length(l.neurons)
         l.output[j] = update!(l.neurons[j], l.input[j], dt, t)
     end

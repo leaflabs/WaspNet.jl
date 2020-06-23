@@ -6,10 +6,10 @@ Given an element `el` along with indices for target `Neuron`s, constructs new `L
 `layers` should be an array of indices relative to the `Network` it is being pruned in; `neurons` should be an array of arrays of indices where the entries in each inner array are indices of neurons within the respective `Layer` from `layers`.
 
 # Arguments
--`el::WaspnetElement`: The element to prune neurons from, either a `Network` or `Layer`
--`layers`: A list of indices for which `Layer`s we're removing neurons from the `Network` where it resides
--`neurons`: A list of lists of neurons to remove in the respective entries from `layers`.
--`l_idx`: If `prune` is called on a `Layer`, `l_idx` denotes the index of the that `Layer` if it were to appear in the list `layers`
+- `el::WaspnetElement`: The element to prune neurons from, either a `Network` or `Layer`
+- `layers`: A list of indices for which `Layer`s we're removing neurons from the `Network` where it resides
+- `neurons`: A list of lists of neurons to remove in the respective entries from `layers`.
+- `l_idx`: If `prune` is called on a `Layer`, `l_idx` denotes the index of the that `Layer` if it were to appear in the list `layers`
 """
 function prune(el::WaspnetElement, layers, neurons) end
 

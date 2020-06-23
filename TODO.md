@@ -24,26 +24,28 @@
 
 ====================================================================================================
 
-- [ ] Docstrings
+- [X] Docstrings
 	- [X] Izh Neuron
 	- [X] LIF Neuron
 	- [X] Functional neurons
 		- [X] Functional refactor
 	- [X] `Layer`
-	- [ ] `Network`
-	- [ ] Generic functions for docs (?)
+	- [X] `Network`
+	- [X] Generic functions for docs (?)
 		- [X] Added `defs.jl` for abstract functions for documentation
 - [X] Optimizations
 	- [X] Do `Layer` updates in-place
 	- [X] Do `Network` updates in-place
 	- [X] Remove broadcasting in `Layer` and `Network`
-- [ ] Simple example
-	- [ ] ???
-- [ ] Review tests for relevance
+- [X] Simple example
+	- [X] ???
 - [X] Re-type to <:AbstractArray{T,dims} 
 	- [X] LIF, Izh, Functional
 	- [X] Layer
 	- [X] Network
+- [ ] Review tests for relevance
+- [X] Reference page with all of methods and types in docs
+- [ ] Get rid of BlockArrays, just use a list of weight matrices
 
 ====================================================================================================
 
