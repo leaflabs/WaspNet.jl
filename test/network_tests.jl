@@ -15,19 +15,7 @@
         @test begin                         
             ( all(net_hom.layers[1].conns .== [0]) &&
                 all(net_hom.layers[2].conns .== [1]) )
-        end
-
-        # Layers should now have BlockArrays
-        @test begin                         
-            isa(net_hom.layers[1].W, AbstractBlockArray) &&
-                isa(net_hom.layers[2].W, AbstractBlockArray)
-        end
-
-        # Layer block arrays should have correct size
-        @test begin                         
-            ( all(size(net_hom.layers[1].W) .== [N, N_in + N + N]) &&
-                all(size(net_hom.layers[2].W) .== [N, N_in + N + N]) )
-        end
+        end 
 
         state0 = L1.neurons[1].state[1]
 
@@ -60,9 +48,8 @@
                     sum.(eachrow(W1)), zeros(N)
                     )
                 )
-                
         end
-        # It currently takes two updates to stimulate the second layer
+
         @test begin
             update!(net_hom, ones(Float64, N_in), 0, 0)                         
             all( WaspNet.get_neuron_outputs(net_hom) .≈ vcat(

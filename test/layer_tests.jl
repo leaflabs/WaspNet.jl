@@ -19,7 +19,6 @@
     # Inputs are routed correctly
     @test begin                             
         update!(L, [[2., 3., 4.]], 0., 0.)
-        println(WaspNet.get_neuron_states(L))
         all(WaspNet.get_neuron_states(L) .== [8., 11.])
     end
 
