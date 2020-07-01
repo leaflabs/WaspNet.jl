@@ -31,5 +31,5 @@
         # # Reset the full network
         # @test begin                         
         #     reset!(net_hom)
-        #     all(nnsim.get_neuron_states(net_hom) .== 0.)
+        #     all(WaspNet.get_neuron_states(net_hom) .== 0.)
 end

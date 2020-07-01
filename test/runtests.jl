@@ -1,6 +1,6 @@
-using nnsim, BlockArrays, Test
+using WaspNet, BlockArrays, Test
 
-@testset "nnsim Tests" begin
+@testset "WaspNet Tests" begin
 
     include("neuron_tests.jl")
     include("layer_tests.jl")

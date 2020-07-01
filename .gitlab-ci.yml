@@ -12,7 +12,7 @@ unit_tests:
       - echo ${JULIA_PKGDIR}
       - julia -e "using Pkg;
                   Pkg.develop(PackageSpec(path=\"${CI_PROJECT_DIR}\"));
-                  Pkg.test(\"nnsim\")"
+                  Pkg.test(\"WaspNet\")"
 
     cache:
         key: nnsim-julia

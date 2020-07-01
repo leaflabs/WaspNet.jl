@@ -1,5 +1,5 @@
-name = "nnsim"
-uuid = "2a7ddd44-2043-11ea-1b23-d1c817c05b75"
+name = "WaspNet"
+uuid = "c0b53cd3-4946-4106-b8e7-91971464ade9"
 authors = ["Sam Buercklin <buercklin@leaflabs.com>"]
 version = "0.1.0"
 

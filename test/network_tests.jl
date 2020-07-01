@@ -3,9 +3,9 @@
     N_in = 16
 
     @testset "Homogeneous Networks FF" begin
-        neurons1 = [nnsim.identity() for _ in 1:N]
+        neurons1 = [WaspNet.identity() for _ in 1:N]
         W1 = randn(N, N_in)
-        neurons2 = [nnsim.identity() for _ in 1:N]
+        neurons2 = [WaspNet.identity() for _ in 1:N]
         W2 = randn(N, N)
         L1 = Layer(neurons1, W1)
         L2 = Layer(neurons2, W2)
@@ -33,7 +33,7 @@
 
         # All neurons initialized correctly
         @test begin                         
-            all(nnsim.get_neuron_states(net_hom) .== 0.)
+            all(WaspNet.get_neuron_states(net_hom) .== 0.)
         end
 
         # Layers are changed to have correct `conns` given the feed-forward network
@@ -44,19 +44,19 @@
 
         # Neuron Outputs function works
         @test begin                         
-            all(nnsim.get_neuron_outputs(net_hom) .== 0.)
+            all(WaspNet.get_neuron_outputs(net_hom) .== 0.)
         end
 
         # Update works, not evolving system/state unchanged
         @test begin                         
             update!(net_hom, zeros(Float64, N_in), 0, 0)
-            all(nnsim.get_neuron_states(net_hom) .== 0.)
+            all(WaspNet.get_neuron_states(net_hom) .== 0.)
         end
 
         # Update passes the correct values to layer inputs
         @test begin
             update!(net_hom, ones(Float64, N_in), 0, 0)                         
-            all( nnsim.get_neuron_outputs(net_hom) .≈ vcat(
+            all( WaspNet.get_neuron_outputs(net_hom) .≈ vcat(
                     sum.(eachrow(W1)), zeros(N)
                     )
                 )
@@ -65,7 +65,7 @@
         # It currently takes two updates to stimulate the second layer
         @test begin
             update!(net_hom, ones(Float64, N_in), 0, 0)                         
-            all( nnsim.get_neuron_outputs(net_hom) .≈ vcat(
+            all( WaspNet.get_neuron_outputs(net_hom) .≈ vcat(
                     sum.(eachrow(W1)), sum.(eachrow(W2*W1))
                     )
                 )

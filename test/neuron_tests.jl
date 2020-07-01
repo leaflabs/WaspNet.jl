@@ -1,6 +1,6 @@
 @testset "Neurons" begin
     @testset "LIF" begin
-        lif = nnsim.LIF()
+        lif = WaspNet.LIF()
         @test lif.state[1] == lif.v0        # Constructor works
 
         @test begin                         # Adding input to state without time evolution
@@ -20,7 +20,7 @@
     end
 
     @testset "Izhikevich" begin
-        izh = nnsim.Izh()
+        izh = WaspNet.Izh()
         v0 = izh.v0
         u0 = izh.u0
         @test all(izh.state .== [v0, u0])   # Constructor works
@@ -42,7 +42,7 @@
     end
 
     @testset "ReLU" begin
-        ReLU = nnsim.ReLU()
+        ReLU = WaspNet.ReLU()
         @test ReLU.state[1] == 0.        # Constructor works
 
         @test begin                         # Adding input to state without time evolution
@@ -57,7 +57,7 @@
     end
 
     @testset "tanh" begin
-        n_tanh = nnsim.tanh()
+        n_tanh = WaspNet.tanh()
         @test n_tanh.state[1] == 0.        # Constructor works
 
         @test begin                         # Adding input to state without time evolution
@@ -72,7 +72,7 @@
     end
 
     @testset "sigmoid" begin
-        sigmoid = nnsim.sigmoid()
+        sigmoid = WaspNet.sigmoid()
         @test sigmoid.state[1] == 0.        # Constructor works
 
         @test begin                         # Adding input to state without time evolution
@@ -87,7 +87,7 @@
     end
 
     @testset "identity neuron" begin
-        id = nnsim.identity()
+        id = WaspNet.identity()
         @test id.state[1] == 0.
 
         @test begin

@@ -6,7 +6,7 @@ The following code has been tested in Julia 1.4.2 and executes without errors. A
 To start, the only necessary dependency will be `WaspNet` itself, so we start by importing it. Other useful packages will be `Random` and `BlockArrays`
 
 ```
-using nnsim
+using WaspNet
 ```
 ## Constructing a New Neuron
 The simlpest unit in `WaspNet` is the `Neuron` which translates an input signal from preceding neurons into the evolution of an internal state and ultimately spikes which are sent to neurons down the line.
@@ -16,7 +16,7 @@ A concrete `AbstractNeuron` needs to cover 3 things:
  - An `update!` method to implement the dynamics of the neuron
  - A `reset!` method which restores the neuron to its default state.
 
-We will implement the [Leaky Integrate-&-Fire](https://en.wikipedia.org/wiki/Biological_neuron_model#Leaky_integrate-and-fire) neuron model here, but a slightly different implementation is available in `nnsim/src/neurons/lif.jl` or with `nnsim.LIF`. 
+We will implement the [Leaky Integrate-&-Fire](https://en.wikipedia.org/wiki/Biological_neuron_model#Leaky_integrate-and-fire) neuron model here, but a slightly different implementation is available in `WaspNet/src/neurons/lif.jl` or with `WaspNet.LIF`. 
 
 A concrete `AbstractNeuron` implementation currently must include two specific fields: `state` and `output`. `state` holds the current state of the neuron in a `Vector` and `output` holds the output of the neuron after its last update; for a spiking neuron, update is either a `0` or a `1` to denote whether a spike did or did not occur. Additional fields should be implemented as needed to parameterize the neuron. For performance, our implementation ofthe struct is immutable, so `state` and `output` must be `Array`s in order to have their values change.
 ```
@@ -34,13 +34,13 @@ end
 # output
 
 ```
-Additionally, we need to define how to evolve our neuron given a time step. This is done by adding a method to `nnsim.update!`,  a function which is global across all `WaspnetElements`. To `update!` a neuron, we provide the `neuron` we need to update, the `input_update` to the neuron, the time duration to evolve `dt`, and the current global time `t`. In the LIF case, the `input_update` is a voltage which must be added to the membrane potential of the neuron resulting from spikes in neurons which feed into the current neuron. `reset!` simply restores the state of the neuron to its some state.
+Additionally, we need to define how to evolve our neuron given a time step. This is done by adding a method to `WaspNet.update!`,  a function which is global across all `WaspnetElements`. To `update!` a neuron, we provide the `neuron` we need to update, the `input_update` to the neuron, the time duration to evolve `dt`, and the current global time `t`. In the LIF case, the `input_update` is a voltage which must be added to the membrane potential of the neuron resulting from spikes in neurons which feed into the current neuron. `reset!` simply restores the state of the neuron to its some state.
 
 We use an [Euler update](https://en.wikipedia.org/wiki/Euler_method) for the time evolution because of its simplicity of implementation.
 
-Note that both `update!` and `reset!` are defined *within* `WaspNet`; that is, we actually define the methods `nnsim.update!` and `nnsim.reset!`. If defined externally, these methods are not visible to other methods from within `WaspNet`.
+Note that both `update!` and `reset!` are defined *within* `WaspNet`; that is, we actually define the methods `WaspNet.update!` and `WaspNet.reset!`. If defined externally, these methods are not visible to other methods from within `WaspNet`.
 ```
-function nnsim.update!(neuron::LIF, input_update, dt, t) 
+function WaspNet.update!(neuron::LIF, input_update, dt, t) 
     neuron.output[1] = 0 # Reset spikes
     neuron.state[1] += input_update # If an impulse came in, add it
 
@@ -92,7 +92,7 @@ We can also `update!` a `Layer` by driving it with some input as we did for our 
 ```
 reset!(layer)
 update!(layer, [[0.5, 0.8]], 0.001, 0)
-println(nnsim.get_neuron_states(layer))
+println(WaspNet.get_neuron_states(layer))
 # [-49.541978928637135, -49.60578871324857, ..., -50.84036022383181]
 ```
 And we can `simulate!` with the same syntax as before
@@ -141,7 +141,7 @@ mynet = Network([layer1, layer2], Nin)
 ```
 reset!(mynet)
 update!(mynet, 0.4*ones(Nin), 0.001, 0)
-println(nnsim.get_neuron_states(mynet))
+println(WaspNet.get_neuron_states(mynet))
 # [-49.61444931320574, -50.42051080817629, ..., -49.993125]
 ```
 As does `simulate!`

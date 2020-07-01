@@ -1,4 +1,4 @@
-module nnsim
+module WaspNet
 
 # Used for concise constructors with @with_kw macro
 using Parameters

@@ -38,7 +38,7 @@ function layer_constructor(n_constr, N_neurons, N_layers, input_layers, init_dis
     return Layer(neurons, W, input_layers)
 end
 
-function network_constructor(N_layers, N_neurons; n_constr = nnsim.Izh, connections = [], init_dist = Normal(0,1))
+function network_constructor(N_layers, N_neurons; n_constr = WaspNet.Izh, connections = [], init_dist = Normal(0,1))
     if connections == []
         connections = [[i] for i in 0:(N_layers-1)]
     end

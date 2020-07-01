@@ -3,49 +3,49 @@
 ## Neurons
 ### LIF
 ```@docs
-	nnsim.LIF
+	WaspNet.LIF
 ```
 ```@autodocs 
-Modules = [nnsim]
+Modules = [WaspNet]
 Pages = ["LIF.jl"]
 Order = [:type, :function]
 ```
 ### Izh 
 ```@docs
-	nnsim.Izh
+	WaspNet.Izh
 ```
 ```@autodocs 
-Modules = [nnsim]
+Modules = [WaspNet]
 Pages = ["Izh.jl"]
 Order = [:type, :function]
 ```
 ### Functional Neurons
 ```@docs
-	nnsim.Functional
+	WaspNet.Functional
 ```
 ```@autodocs 
-Modules = [nnsim]
+Modules = [WaspNet]
 Pages = ["functional.jl"]
 Order = [:type, :function]
 ```
 
 ## Layers
 ```@autodocs
-Modules = [nnsim]
+Modules = [WaspNet]
 Pages = ["layer.jl"]
 Order = [:type, :function]
 ```
 
 ## Networks
 ```@autodocs
-Modules = [nnsim]
+Modules = [WaspNet]
 Pages = ["network.jl"]
 Order = [:type, :function]
 ```
 
 ## Simulations
 ```@autodocs
-Modules = [nnsim]
+Modules = [WaspNet]
 Pages = ["simulate.jl"]
 Order = [:type, :function]
 ```
@@ -53,13 +53,13 @@ Order = [:type, :function]
 ## Utilities
 ### General Utilities
 ```@autodocs
-Modules = [nnsim]
+Modules = [WaspNet]
 Pages = ["src/utilities/utils.jl"]
 Order = [:type, :function]
 ```
 ### Pruning
 ```@autodocs
-Modules = [nnsim]
+Modules = [WaspNet]
 Pages = ["src/utilities/pruning.jl"]
 Order = [:type, :function]
 ```

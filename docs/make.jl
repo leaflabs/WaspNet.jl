@@ -1,7 +1,7 @@
-using Documenter, nnsim
+using Documenter, WaspNet
 
 makedocs(
-	sitename="nnsim",
+	sitename="WaspNet",
 	pages = [
 		"Overview of WaspNet" => "overview.md",
 		"Example" => "example.md",
