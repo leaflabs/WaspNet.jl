@@ -41,15 +41,7 @@
             all(WaspNet.get_neuron_states(net_hom) .== 0.)
         end
 
-        # Update passes the correct values to layer inputs
-        @test begin
-            update!(net_hom, ones(Float64, N_in), 0, 0)                         
-            all( WaspNet.get_neuron_outputs(net_hom) .≈ vcat(
-                    sum.(eachrow(W1)), zeros(N)
-                    )
-                )
-        end
-
+        # Update passes the correct values to network inputs
         @test begin
             update!(net_hom, ones(Float64, N_in), 0, 0)                         
             all( WaspNet.get_neuron_outputs(net_hom) .≈ vcat(

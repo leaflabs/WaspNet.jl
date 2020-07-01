@@ -122,12 +122,7 @@ neurons2 = [LIF(8., 10.E2, 30., 40., -55., [-55.], [0.]) for _ in 1:N2]
 
 W12 = randn(N2, N1) # connections from layer 1
 W22 = 5*randn(N2, N2) # Recurrent connections
-row_block_sizes = [N2]
-col_block_sizes = [Nin, N1, N2]
-
-weights2 = BlockArray(zeros(N2, Nin+N1+N2), row_block_sizes, col_block_sizes) 
-weights2[Block(1,2)] .= W21
-weights2[Block(1,3)] .= W22
+weights2 = [W12, W22]
 
 conns = [1, 2]
 

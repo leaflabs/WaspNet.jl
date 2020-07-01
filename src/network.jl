@@ -21,19 +21,14 @@ mutable struct Network<:AbstractNetwork
         N_layers = length(layers)
         N_neurons = sum(neurons_per_layer)
 
-        net_layers = []
+        net_layers = Array{AbstractLayer,1}()
         for (i,l) in enumerate(layers)
-            N_layer_neurons = neurons_per_layer[i]
-            
-            W = BlockArray(zeros(N_layer_neurons, N_neurons + N_in), [N_layer_neurons], output_sizes)
             conns = Array{Int,1}()
             if isempty(l.conns)
                 push!(conns, i-1)
-                setblock!(W, l.W, 1, i)
-                new_layer = Layer(l.neurons, W, conns, l.N_neurons, l.input, l.output)
+                new_layer = Layer(l.neurons, l.W, conns, l.N_neurons, l.input, l.output)
             else
                 conns = copy(l.conns)
-                W = copy(l.W)
                 new_layer = deepcopy(l)
             end
             push!(net_layers, new_layer)
@@ -80,12 +75,10 @@ end
 
 function update!(network::Network, input, dt, t)
     copy!(network.prev_outputs[1], input)
-    for (i,l) in enumerate(network.layers)
-        copy!(network.prev_outputs[i+1], l.output)
-    end
 
     for i in 1:length(network.layers)
         update!(network.layers[i],network.prev_outputs,dt,t)
+        copy!(network.prev_outputs[i+1], network.layers[i].output)
     end
 end
 
