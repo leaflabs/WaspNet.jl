@@ -1,8 +1,5 @@
 include("neurons/LIF.jl")
 include("neurons/Izh.jl")
-include("neurons/HH.jl")
-include("neurons/FHN.jl")
-include("neurons/ML.jl")
 include("neurons/functional_neurons.jl")
 
 function get_neuron_outputs(n::AbstractNeuron)
