@@ -67,7 +67,7 @@ end
 
 Simulates the supplied `WaspnetElement` subject to some pre-sampled `input` where each column is one time step and returns the relevant `SimulationResult` instance
 """
-function simulate!(element::WaspnetElement, input::Matrix, dt, tf, t0 = 0.; track_state=false, kwargs...)
+function simulate!(element::WaspnetElement, input::AbstractMatrix, dt, tf, t0 = 0.; track_state=false, kwargs...)
     t_steps = t0:dt:tf
     t = t0
     N_steps = length(t_steps) - 1
