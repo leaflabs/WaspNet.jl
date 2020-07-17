@@ -1,11 +1,11 @@
 module WaspNet
 
 # Used for concise constructors with @with_kw macro
-using Parameters
 using BlockArrays
 using Distributions
-using Random
 using LinearAlgebra
+using Parameters
+using Random
 
 include("types.jl")
 include("defs.jl")
