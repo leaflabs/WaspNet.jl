@@ -13,6 +13,13 @@ Reset the `WaspnetElement` to a default state defined by the method.
 function reset!(ne::WaspnetElement) end
 
 """
+	reset(n::AbstractNeuron)
+
+Resets the neuron and returns the new struct with original values but the state updated.
+"""
+function reset(n::AbstractNeuron) end
+
+"""
 	simulate!(element<:WaspnetElement, input, dt, tf, t0 = 0.; track_state=false, kwargs...)
 
 Simulates a given `WaspnetElement` element from times `t0` to `tf` with increments of `dt` subject to an input `input`, storing the results in a SimulationResult instance.

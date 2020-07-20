@@ -78,17 +78,15 @@ This (default) method assumes a feed-forward, non-BlockArray representation for 
 - `t`: the time at the start of the current time step
 """
 function update!(l::Layer{L,N,A,M}, input, dt, t) where {L,N,A,M<:AbstractArray{N,2}}
-    if isempty(l.conns) && any_nonzero(input[1])
+    if isempty(l.conns) 
         mul!(l.input, l.W, input[1])
     elseif !isempty(l.conns)
         conn = l.conns[1] # should only have one connection
-        if any_nonzero(input[conn+1])
-            mul!(l.input, l.W, input[conn+1])
-        end
+        mul!(l.input, l.W, input[conn+1])
     end
 
     for j in 1:length(l.neurons)
-        l.output[j] = update!(l.neurons[j], l.input[j], dt, t)
+        (l.output[j], l.neurons[j]) = update!(l.neurons[j], l.input[j], dt, t)
     end
     return l.output
 end
@@ -101,17 +99,11 @@ Evolve the state of all of the neurons in the `Layer` a duration `dt`, starting 
 Not all arrays within `input` are used; we iterate over `l.conn` to select the appropriate inputs to this `Layer`, and the corresponding `Block`s from `l.W` are used to calculate the net `Layer` input.
 """
 function update!(l::Layer{L,N,A,M}, input, dt, t) where {L,N,A,M<:AbstractBlockArray}
-    for j in 1:length(l.input) # reset the input vector to the layer
-        l.input[j] = 0
-    end
-
     for conn in l.conns
-        if any_nonzero(input[conn+1])
-            mul!(l.input, l.W[Block(1, conn+1)], input[conn+1], 1, 1)
-        end
+        mul!(l.input, l.W[Block(1, conn+1)], input[conn+1], 1, 1)
     end
     for j in 1:length(l.neurons)
-        l.output[j] = update!(l.neurons[j], l.input[j], dt, t)
+        (l.output[j], l.neurons[j]) = update!(l.neurons[j], l.input[j], dt, t)
     end
     return l.output
 end
@@ -124,17 +116,11 @@ Evolve the state of all of the neurons in the `Layer` a duration `dt`, starting 
 Not all arrays within `input` are used; we iterate over `l.conn` to select the appropriate inputs to this `Layer`, and the corresponding `Block`s from `l.W` are used to calculate the net `Layer` input.
 """
 function update!(l::Layer{L,N,A,M}, input, dt, t) where {L,N,A,M<:AbstractArray{<:AbstractArray,1}}
-    for j in 1:length(l.input) # reset the input vector to the layer
-        l.input[j] = 0
-    end
-
     for (conn,W) in zip(l.conns, l.W)
-        if any_nonzero(input[conn+1])
-            mul!(l.input, W, input[conn+1], 1, 1)
-        end
+        mul!(l.input, W, input[conn+1], 1, 1)
     end
     for j in 1:length(l.neurons)
-        l.output[j] = update!(l.neurons[j], l.input[j], dt, t)
+        (l.output[j], l.neurons[j]) = update!(l.neurons[j], l.input[j], dt, t)
     end
     return l.output
 end
@@ -145,7 +131,7 @@ end
 Reset all of the neurons in `l` to the state defined by their `reset!` function.
 """
 function reset!(l::AbstractLayer)
-    reset!.(l.neurons)
+    l.neurons .= reset.(l.neurons)
 end
 
 """
@@ -154,7 +140,7 @@ end
 Return the current state of `l`'s constituent neurons
 """
 function get_neuron_states(l::AbstractLayer)
-    return vcat([n.state for n in l.neurons]...)
+    return vcat([get_neuron_states(n) for n in l.neurons]...)
 end
 
 """
