@@ -140,7 +140,7 @@ end
 Return the current state of `l`'s constituent neurons
 """
 function get_neuron_states(l::AbstractLayer)
-    return vcat([get_neuron_states(n) for n in l.neurons]...)
+    return reduce(vcat_tuples, [get_neuron_states(n) for n in l.neurons])
 end
 
 """
