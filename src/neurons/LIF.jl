@@ -27,7 +27,7 @@ end
 
 Evolve and `LIF` neuron subject to a membrane potential step of size `input_update` a time duration `dt` starting from time `t`
 """
-function update!(neuron::LIF, input_update, dt, t)
+function update(neuron::LIF, input_update, dt, t)
     output = 0.
     # If an impulse came in, add it
     state = neuron.state + input_update
@@ -41,9 +41,9 @@ function update!(neuron::LIF, input_update, dt, t)
         output = 1. # Binary output
     end
 
-    return (output, LIF(neuron.τ, neuron.R, neuron.θ, neurin.I, neuron.v0, state, output))
+    return (output, LIF(neuron.τ, neuron.R, neuron.θ, neuron.I, neuron.v0, state, output))
 end
 
 function reset(neuron::LIF)
-    return LIF(neuron.τ, neuron.R, neuron.θ, neuron.I, neuron.v0, neuron.v0, 0)
+    return LIF(neuron.τ, neuron.R, neuron.θ, neuron.I, neuron.v0, neuron.v0, 0.)
 end

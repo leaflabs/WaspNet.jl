@@ -12,13 +12,13 @@ A neuron type which applies some scalar function to its input and returns that v
     state::T = 0.
 end
 
-function update!(neuron::Functional, input_update, dt, t)
+function update(neuron::Functional, input_update, dt, t)
     state = neuron.func(input_update)
     return (state, Functional(neuron.func, state))
 end
 
 function reset(neuron::Functional)
-    return Functional(neuron.func, 0)
+    return Functional(neuron.func, 0.)
 end
 
 function get_neuron_outputs(n::Functional{T,F}) where {T,F}

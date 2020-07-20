@@ -30,13 +30,13 @@ The @with_kw macro is used to produce a constructor which accepts keyword argume
 end
 
 """
-    update!(neuron::Izh, input_update, dt, t)
+    update(neuron::Izh, input_update, dt, t)
 
 Evolves the given `Neuron` subject to an input of `input_update` a time duration `dt` starting from time `t` according to the equations defined in the Izhikevich paper https://www.izhikevich.org/publications/spikes.htm
 
 We use an Euler update for solving the set of differential equations for its computational efficiency and simplicity of implementation.
 """
-function update!(neuron::Izh, input_update, dt, t)
+function update(neuron::Izh, input_update, dt, t)
     dt *= 1000. # convert seconds to milliseconds for the Izh model
     output = 0.
     # If an impulse came in, add it
@@ -62,13 +62,13 @@ function update!(neuron::Izh, input_update, dt, t)
 end
 
 """
-    reset!(neuron::Izh)
+    reset(neuron::Izh)
 
 Resets the state of the Izhikevich neuron to its initial values given by `v0`, `u0`
 """
 function reset(neuron::Izh)
     return Izh(
-        neuron.a, neuron.b, neuron.c, neuron.d, neuron.I, neuron.θ, neuron.v0, neuron.u0, neuron.v, neuron.u, 0.
+        neuron.a, neuron.b, neuron.c, neuron.d, neuron.I, neuron.θ, neuron.v0, neuron.u0, neuron.v0, neuron.u0, 0.
         )
 end
 
