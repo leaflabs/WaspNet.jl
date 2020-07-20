@@ -85,8 +85,9 @@ function update!(l::Layer{L,N,A,M}, input, dt, t) where {L,N,A,M<:AbstractArray{
         mul!(l.input, l.W, input[conn+1])
     end
 
+
     for j in 1:length(l.neurons)
-        (l.output[j], l.neurons[j]) = update!(l.neurons[j], l.input[j], dt, t)
+        (l.output[j], l.neurons[j]) = update(l.neurons[j], l.input[j], dt, t)
     end
     return l.output
 end
@@ -99,11 +100,12 @@ Evolve the state of all of the neurons in the `Layer` a duration `dt`, starting 
 Not all arrays within `input` are used; we iterate over `l.conn` to select the appropriate inputs to this `Layer`, and the corresponding `Block`s from `l.W` are used to calculate the net `Layer` input.
 """
 function update!(l::Layer{L,N,A,M}, input, dt, t) where {L,N,A,M<:AbstractBlockArray}
+    fill!(l.input, 0)
     for conn in l.conns
         mul!(l.input, l.W[Block(1, conn+1)], input[conn+1], 1, 1)
     end
     for j in 1:length(l.neurons)
-        (l.output[j], l.neurons[j]) = update!(l.neurons[j], l.input[j], dt, t)
+        (l.output[j], l.neurons[j]) = update(l.neurons[j], l.input[j], dt, t)
     end
     return l.output
 end
@@ -116,11 +118,12 @@ Evolve the state of all of the neurons in the `Layer` a duration `dt`, starting 
 Not all arrays within `input` are used; we iterate over `l.conn` to select the appropriate inputs to this `Layer`, and the corresponding `Block`s from `l.W` are used to calculate the net `Layer` input.
 """
 function update!(l::Layer{L,N,A,M}, input, dt, t) where {L,N,A,M<:AbstractArray{<:AbstractArray,1}}
+    fill!(l.input, 0)
     for (conn,W) in zip(l.conns, l.W)
         mul!(l.input, W, input[conn+1], 1, 1)
     end
     for j in 1:length(l.neurons)
-        (l.output[j], l.neurons[j]) = update!(l.neurons[j], l.input[j], dt, t)
+        (l.output[j], l.neurons[j]) = update(l.neurons[j], l.input[j], dt, t)
     end
     return l.output
 end
