@@ -7,8 +7,8 @@
 
     @test begin                             # Ensure updating neuron does not influence all neurons in layer
         layer = layer_constructor(WaspNet.LIF, 2, 1, [])
-        update!(layer.neurons[1],1,0,0)
-        layer.neurons[1].state[1] != layer.neurons[2].state[1]
+        (_, layer.neurons[1]) = update(layer.neurons[1],1,0,0)
+        WaspNet.get_neuron_states(layer.neurons[1]) != WaspNet.get_neuron_states(layer.neurons[2])
     end
 
     @test begin                             # Function supports passing kwargs

@@ -14,7 +14,6 @@
     @test isempty(L.conns)
     @test all(L.input .== zeros(2)) 
     @test all(L.output .== zeros(2))
-    @test n1.state[1] == n2.state[1]    
 
     # Inputs are routed correctly
     @test begin                             
