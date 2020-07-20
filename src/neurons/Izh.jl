@@ -1,5 +1,5 @@
 """
-    struct Izh{T<:Number, A<:AbstractArray{T,1}}<:AbstractNeuronn
+    struct Izh{T<:Number}<:AbstractNeuronn
 
 Contains the vector of paramters [a, b, c, d, I, θ] necessary to simulate an Izhikevich neuron as well as the current state of the neuron.
 
@@ -11,10 +11,10 @@ The @with_kw macro is used to produce a constructor which accepts keyword argume
 - `θ::T`: Threshold potential (mV)
 - `v0::T`: Reset voltage (mV)
 - `u0::T`: Reset recovery variable value
-- `state::A`: Vector holding the current (v,u) state of the neuron
-- `output::A`: Vector holding the current output of the neuron
+- `state::T`: Vector holding the current (v,u) state of the neuron
+- `output::T`: Vector holding the current output of the neuron
 """
-@with_kw struct Izh{T<:Number, A<:AbstractArray{T,1}}<:AbstractNeuron
+@with_kw struct Izh{T<:Number}<:AbstractNeuron
     a::T = 0.02      
     b::T = 0.2
     c::T = -65.
@@ -24,8 +24,9 @@ The @with_kw macro is used to produce a constructor which accepts keyword argume
 
     v0::T = -65.     # Reset voltage (mV)
     u0::T = 0.       # Reset state variable
-    state::A = [-65., 0.]      # Membrane potential (mV) and state variable
-    output::A = [0.]
+    v::T = -65.      # Membrane potential (mV) 
+    u::T = 0.        # state variable 
+    output::T = 0.
 end
 
 """
@@ -37,26 +38,27 @@ We use an Euler update for solving the set of differential equations for its com
 """
 function update!(neuron::Izh, input_update, dt, t)
     dt *= 1000. # convert seconds to milliseconds for the Izh model
-    neuron.output[1] = 0
+    output = 0.
     # If an impulse came in, add it
-    neuron.state[1] += input_update
+    v = neuron.v + input_update
+    u = neuron.u
 
     # Euler method update
-    u1 = dt*(
-      0.04 * neuron.state[1]^2 + 5*neuron.state[1] + 140 - neuron.state[2] + neuron.I
+    dv = dt*(
+      0.04 * v^2 + 5*v + 140 - u + neuron.I
       )
-    u2 = dt*(neuron.a)*(neuron.b*neuron.state[1]-neuron.state[2])
-    neuron.state[1] += u1
-    neuron.state[2] += u2
+    du = dt*(neuron.a)*(neuron.b*v-u)
+    v += dv
+    u += du
 
     # Check for thresholding
-    if neuron.state[1] >= neuron.θ
-        neuron.state[1] = neuron.v0
-        neuron.state[2] = neuron.state[2] + neuron.d
-        neuron.output[1] = 1
+    if v >= neuron.θ
+        v = neuron.v0
+        u = u + neuron.d
+        output = 1.
     end
 
-    return neuron.output[1]
+    return (output, Izh(neuron.a, neuron.b, neuron.c, neuron.d, neuron.I, neuron.θ, neuron.v0, neuron.u0, v, u, output))
 end
 
 """
@@ -64,7 +66,12 @@ end
 
 Resets the state of the Izhikevich neuron to its initial values given by `v0`, `u0`
 """
-function reset!(neuron::Izh)
-    neuron.state[1] = neuron.v0
-    neuron.state[2] = neuron.u0
+function reset(neuron::Izh)
+    return Izh(
+        neuron.a, neuron.b, neuron.c, neuron.d, neuron.I, neuron.θ, neuron.v0, neuron.u0, neuron.v, neuron.u, 0.
+        )
+end
+
+function get_neuron_states(neuron::Izh)
+    return (neuron.v, neuron.u)
 end

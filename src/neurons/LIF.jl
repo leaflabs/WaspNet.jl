@@ -1,5 +1,5 @@
 """
-    LIF{T<:Number,A<:AbstractArray{T, 1}}<:AbstractNeuron 
+    LIF{T<:Number}<:AbstractNeuron 
 
 Contains the necessary parameters for describing a Leaky Integrate-and-Fire (LIF) neuron as well as the current membrane potential of the neuron.
 
@@ -9,17 +9,17 @@ Contains the necessary parameters for describing a Leaky Integrate-and-Fire (LIF
 - `θ::T`: Threshold voltage (mV)
 - `I::T`: Background current injection (mV)
 - `v0::T`: Reset voltage (mV)
-- `state::A`: Current membrane potential (mV)
+- `state::T`: Current membrane potential (mV)
 """
-@with_kw struct LIF{T<:Number,A<:AbstractArray{T, 1}}<:AbstractNeuron 
+@with_kw struct LIF{T<:Number}<:AbstractNeuron 
     τ::T = 8.         
     R::T = 10.E3      
     θ::T = 30.      
     I::T = 40.      
 
     v0::T = -55.     
-    state::A = [-55.]
-    output::A = [0.]     
+    state::T = -55.
+    output::T = 0.     
 end
 
 """
@@ -28,22 +28,22 @@ end
 Evolve and `LIF` neuron subject to a membrane potential step of size `input_update` a time duration `dt` starting from time `t`
 """
 function update!(neuron::LIF, input_update, dt, t)
-    neuron.output[1] = 0
+    output = 0.
     # If an impulse came in, add it
-    neuron.state[1] += input_update
+    state = neuron.state + input_update
 
     # Euler method update
-    neuron.state[1] += (dt/neuron.τ) * (-neuron.state[1] + neuron.R*neuron.I)
+    state += (dt/neuron.τ) * (-state + neuron.R*neuron.I)
 
     # Check for thresholding
-    if neuron.state[1] >= neuron.θ
-        neuron.state[1] = neuron.v0
-        neuron.output[1] = 1 # Binary output
+    if state >= neuron.θ
+        state = neuron.v0
+        output = 1. # Binary output
     end
 
-    return neuron.output[1] 
+    return (output, LIF(neuron.τ, neuron.R, neuron.θ, neurin.I, neuron.v0, state, output))
 end
 
-function reset!(neuron::LIF)
-    neuron.state .= neuron.v0
+function reset(neuron::LIF)
+    return LIF(neuron.τ, neuron.R, neuron.θ, neuron.I, neuron.v0, neuron.v0, 0)
 end
