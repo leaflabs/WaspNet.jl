@@ -59,7 +59,7 @@ function simulate!(element::WaspnetElement, input::Function, dt, tf, t0 = 0.; tr
     t_steps = t0:dt:tf
    
     input_matrix = hcat(input.(t_steps[1:(end-1)])...) 
-    return simulate!(element, input_matrix, dt, tf, t0, track_state = track_state)
+    return simulate!(element, input_matrix, dt, tf, t0, track_state = track_state, kwargs...)
 end
 
 """
@@ -69,23 +69,39 @@ Simulates the supplied `WaspnetElement` subject to some pre-sampled `input` wher
 """
 function simulate!(element::WaspnetElement, input::AbstractMatrix, dt, tf, t0 = 0.; track_state=false, kwargs...)
     t_steps = t0:dt:tf
+    result = SimulationResult(element, t_steps)
+
+    return simulate!(result, element, input, dt, tf, t0, track_state=track_state, kwargs...) 
+end
+
+function simulate!(
+    result::SimulationResult, element::WaspnetElement, input::Function, dt, tf, t0 = 0.; track_state=false, kwargs...
+    )
+    t_steps = t0:dt:tf
+
+    input_matrix = hcat(input.(t_steps[1:(end-1)])...)
+    return simulate!(result, element, input_matrix, dt, tf, t0, track_state=track_state, kwargs...)
+end
+
+function simulate!(
+    result::SimulationResult, element::WaspnetElement, input::AbstractMatrix, dt, tf, t0 = 0.; track_state=false, kwargs...
+    )
+    t_steps = t0:dt:tf
     t = t0
     N_steps = length(t_steps) - 1
 
-    result = SimulationResult(element, t_steps)
-
     # The +1 here is to ensure that we get the initial state at t=t0 in the outputs
-    result.outputs[:,1] .= get_neuron_outputs(element)
+    copyto!(view(result.outputs,:,1), get_neuron_outputs(element))
     if track_state
-        result.states[:,1] .= get_neuron_states(element)
+        copyto!(view(result.states, :,1), get_neuron_states(element))
     end
 
     for i in 1:N_steps
         sim_update!(element, input[:,i], dt, t)
         # The +1 here is the offset from including the initial values in the outputs
-        result.outputs[:, i+1] .= get_neuron_outputs(element)
+        copyto!(view(result.outputs, :, i+1), get_neuron_outputs(element))
         if track_state
-            result.states[:,i+1] .= get_neuron_states(element)
+            copyto!(view(result.states, :, i+1), get_neuron_states(element))
         end
         t += dt
     end
