@@ -4,6 +4,9 @@ stages:
 unit_tests:
     image: julia:1.4.2
     stage: test
+    tags:
+      - linux
+      - autoscale
 
     variables:
         JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia/"
