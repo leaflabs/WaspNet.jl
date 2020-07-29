@@ -123,5 +123,5 @@ end
 Wrapper to ensure that if a 1D array is passed to update a neuron, it is converted to a scalar first
 """
 function sim_update!(neuron::AbstractNeuron, input_update::AbstractArray{T,N}, dt, t) where {T<:Number, N}
-    return update!(neuron, input_update[1], dt, t)
+    return update(neuron, input_update[1], dt, t)
 end

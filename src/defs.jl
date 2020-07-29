@@ -6,7 +6,7 @@ Evolve the `WaspnetElement` subject to an input `input` a duration of time `dt` 
 function update!(ne::WaspnetElement, input, dt, t) end
 
 function update!(ne::AbstractNeuron, input, dt, t)
-    warning("Neurons should use update, not update! function")
+    @warn "Neurons should use update, not update! function"
     return update(ne, input, dt, t)
 end
 
@@ -18,7 +18,7 @@ Reset the `WaspnetElement` to a default state defined by the method.
 function reset!(ne::WaspnetElement) end
 
 function reset!(ne::AbstractNeuron, input, dt, t)
-    warning("Neurons should use reset, not reset! function")
+    @warn "Neurons should use reset, not reset! function"
     return reset(ne, input, dt, t)
 end
 
