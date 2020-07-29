@@ -2,7 +2,7 @@ stages:
   - test
 
 unit_tests:
-    image: julia:1.4.1
+    image: julia:1.4.2
     stage: test
 
     variables:
@@ -15,6 +15,6 @@ unit_tests:
                   Pkg.test(\"WaspNet\")"
 
     cache:
-        key: nnsim-julia
+        key: waspnet-julia
         paths:
           - .julia/
