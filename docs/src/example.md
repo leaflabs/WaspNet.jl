@@ -32,13 +32,13 @@ struct LIF{T<:Number}<:AbstractNeuron
 end
 
 ```
-Additionally, we need to define how to evolve our neuron given a time step. This is done by adding a method to `WaspNet.update!`,  a function which is global across all `WaspnetElements`. To `update` a neuron, we provide the `neuron` we need to update, the `input_update` to the neuron, the time duration to evolve `dt`, and the current global time `t`. In the LIF case, the `input_update` is a voltage which must be added to the membrane potential of the neuron resulting from spikes in neurons which feed into the current neuron. `reset` simply restores the state of the neuron to its some state.
+Additionally, we need to define how to evolve our neuron given a time step. This is done by adding a method to `WaspNet.update!` or `WaspNet.update`, a function which is global across all `WaspnetElements`. To `update` a neuron, we provide the `neuron` we need to update, the `input_update` to the neuron, the time duration to evolve `dt`, and the current global time `t`. In the LIF case, the `input_update` is a voltage which must be added to the membrane potential of the neuron resulting from spikes in neurons which feed into the current neuron. `reset` simply restores the state of the neuron to its some state.
 
 We use an [Euler update](https://en.wikipedia.org/wiki/Euler_method) for the time evolution because of its simplicity of implementation.
 
 Note that both `update` and `reset` are defined *within* `WaspNet`; that is, we actually define the methods `WaspNet.update` and `WaspNet.reset`. If defined externally, these methods are not visible to other methods from within `WaspNet`.
 ```
-function update(neuron::LIF, input_update, dt, t)
+function WaspNet.update(neuron::LIF, input_update, dt, t)
     output = 0.
     
     state = neuron.state + input_update # If an impulse came in, add it
@@ -65,7 +65,7 @@ update!(neuronLIF, 0., 0.001, 0)
 println(neuronLIF.state)
 # -49.993125
 
-reset!(neuronLIF)
+neuronLIF = reset(neuronLIF)
 println(neuronLIF.state)
 # -55.0
 ```
