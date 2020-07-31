@@ -3,6 +3,10 @@
 
 `WaspNet.jl` is intended for exploring SNN or hybrid architectures and experimenting with new neuron models. `Network` and `Layer` abstractions are provided, and an `AbstractNeuron` type is defined for users to construct their own neuron models. Utilizing multiple dispatch ensures that new neuron types slot easily into the existing framework.
 
+# Documentation
+
+Example code and references can be found in the [WaspNet.jl Documentation](https://leaflabs.github.io/WaspNet.jl/)
+
 # Installation
 
 To install `WaspNet.jl`, from the REPL go into `Pkg` mode by pressing `]` and then `add WaspNet`.
