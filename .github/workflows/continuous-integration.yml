@@ -1,0 +1,36 @@
+# This is a basic flow to run WaspNet Unit Tests
+
+name: WaspNet-CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+
+jobs:
+  test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Setup cache for Julia package registry
+    - name: Cache Registry
+      id: registry-cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.julia
+        key: ${{ runner.os }}-registry-${{ hashFiles('Manifest.toml','Project.toml') }}
+      
+    # Runs unit tests using the default version of Julia
+    - name: Test
+      run: |
+        julia -e "using Pkg;
+                  Pkg.develop(PackageSpec(path=\"$GITHUB_WORKSPACE\"));
+                  Pkg.test(\"WaspNet\")"
