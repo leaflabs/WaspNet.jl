@@ -12,8 +12,8 @@ Contains the necessary parameters for describing a Leaky Integrate-and-Fire (LIF
 - `state::T`: Current membrane potential (mV)
 """
 @with_kw struct LIF{T<:Number}<:AbstractNeuron 
-    τ::T = 8.         
-    R::T = 10.E3      
+    τ::T = 4.         
+    R::T = 6.      
     θ::T = 30.      
     I::T = 40.      
 
