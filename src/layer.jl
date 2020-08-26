@@ -19,15 +19,16 @@ struct Layer{
     W::M 
     conns::Array{Int,1}
     N_neurons::Int
+    state_size::Int
     input::A
     output::A
 
     # Default constructor, parametric. All Layers use this constructor eventually
     function Layer{L,N,A,M}(
-        neurons::Array{L,1}, W::M, conns::Array{Int,1}, N_neurons::Int, input::Array{N,1}, output::Array{N,1} 
+        neurons::Array{L,1}, W::M, conns::Array{Int,1}, N_neurons::Int, state_size::Int, input::Array{N,1}, output::Array{N,1} 
         ) where {L<:AbstractNeuron, N<:Number, A<:AbstractArray{N,1}, M<:Union{AbstractArray{N,2}, Array{<:AbstractArray{N,2},1}}}
 
-        return new{L,N,A,M}(neurons, W, conns, N_neurons, input, output)
+        return new{L,N,A,M}(neurons, W, conns, N_neurons, state_size, input, output)
     end
 end
 
@@ -37,13 +38,13 @@ end
 Default non-parametric constructor for `Layer`s for pre-processing inputs and computing parametric types.
 """
 function Layer(
-    neurons::Array{L,1}, W::M, conns::Array{J,1}, N_neurons::Int, input::A, output::A
+    neurons::Array{L,1}, W::M, conns::Array{J,1}, N_neurons::Int, state_size::Int, input::A, output::A
     ) where {J, L<:AbstractNeuron, N<:Number, A<:AbstractArray{N,1}, M<:Union{AbstractArray{N,2}, Array{<:AbstractArray{N,2},1}}}
 
     if isempty(conns)
         conns = Array{Int,1}()
     end
-    return Layer{L,N,A,M}(neurons, W, conns, N_neurons, input, output)
+    return Layer{L,N,A,M}(neurons, W, conns, N_neurons, state_size, input, output)
 end
 
 """
@@ -56,12 +57,57 @@ function Layer(neurons, W, conns = Array{Int, 1}(undef, 0))
     N_neurons = length(neurons)
     input = zeros(N_neurons)
     output = zeros(N_neurons)
-    return Layer(neurons, W, conns, N_neurons, input, output) 
+    s_size = state_size(neurons[1])
+    return Layer(neurons, W, conns, N_neurons, s_size, input, output) 
 end
 
 function Layer(neurons, W::AbstractBlockArray)
     error("`Layer(neurons, W)` construction not available for `AbstractBlockArray`s; feed-forward only")
 end
+
+function update!(l::Layer, du, u, t)
+    @views @inbounds for j in 1:l.N_neurons
+        idxs = j:l.N_neurons:(l.N_neurons*l.state_size)
+        du[idxs] .= update(l.neurons[j], u[idxs], t)
+    end
+end
+
+function event(l::Layer, u, t)
+    evnt = false
+    @views @inbounds for j in 1:l.N_neurons
+        idxs = j:l.N_neurons:(l.N_neurons*l.state_size)
+        (nspike, nval) = event(l.neurons[j], u[idxs], t)
+
+        l.output[j] = nval
+        evnt = evnt || nspike
+    end
+    return evnt
+end
+
+function aff_layer!(l::Layer{L,N,A,M}, u, input, t) where {L,N,A,M<:AbstractArray{N,2}}
+    if isempty(l.conns) 
+        mul!(l.input, l.W, input[1], 1, 1)
+    elseif !isempty(l.conns)
+        conn = l.conns[1] # should only have one connection
+        mul!(l.input, l.W, input[conn+1], 1, 1)
+    end
+
+    @views @inbounds for j in 1:l.N_neurons
+        idxs = j:l.N_neurons:(l.N_neurons*l.state_size)
+        if l.output[j] != 0
+            u[idxs] .= reset(l.neurons[j], u[idxs])
+        end
+        aff_neuron!(l.neurons[j], u[idxs], l.input[j], t)
+    end
+end
+
+
+
+################################################################################################
+#
+# OLD STUFF WE DON'T USE EXPLICITLY
+#
+################################################################################################
 
 """
     function update!(l::Layer, input, dt, t)
@@ -91,6 +137,8 @@ function update!(l::Layer{L,N,A,M}, input, dt, t) where {L,N,A,M<:AbstractArray{
     end
     return l.output
 end
+
+
 
 """
     function update!(l::Layer{L,N,A,M}, input, dt, t)
