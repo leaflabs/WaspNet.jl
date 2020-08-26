@@ -28,14 +28,22 @@ function update(neuron::LIF, u, t)
     dv = (-u[1] + neuron.R*neuron.I) / neuron.τ
     return (dv, )
 end
-function event(neuron::LIF, u, t)
-    u[1] > neuron.θ
+
+function aff_neuron!(neuron::LIF, u, input, t)
+    u[1] += input;
 end
 
-function reset(neuron::LIF)
+function event(neuron::LIF, u, t)
+    spike = u[1] > neuron.θ
+    if spike
+        return (spike, 1)
+    else
+        return (spike, 0)
+    end
+end
+
+function reset(neuron::LIF, u)
     return (neuron.v0, )
 end
 
-function state_size(neuron::LIF)
-    return 1
-end
+state_size(neuron::LIF) = 1
