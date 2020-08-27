@@ -85,6 +85,7 @@ function event(l::Layer, u, t)
 end
 
 function aff_layer!(l::Layer{L,N,A,M}, u, input, t) where {L,N,A,M<:AbstractArray{N,2}}
+    fill!(l.input, 0)
     if isempty(l.conns) 
         mul!(l.input, l.W, input[1], 1, 1)
     elseif !isempty(l.conns)
