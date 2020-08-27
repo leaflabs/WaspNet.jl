@@ -23,10 +23,6 @@ The @with_kw macro is used to produce a constructor which accepts keyword argume
     θ::T = 30.       
 
     v0::T = -65.     # Reset voltage (mV)
-    u0::T = 0.       # Reset state variable
-    v::T = -65.      # Membrane potential (mV) 
-    u::T = 0.        # state variable 
-    output::T = 0.
 end
 
 """
@@ -36,42 +32,27 @@ Evolves the given `Neuron` subject to an input of `input_update` a time duration
 
 We use an Euler update for solving the set of differential equations for its computational efficiency and simplicity of implementation.
 """
-function update(neuron::Izh, input_update, dt, t)
-    dt *= 1000. # convert seconds to milliseconds for the Izh model
-    output = 0.
-    # If an impulse came in, add it
-    v = neuron.v + input_update
-    u = neuron.u
 
-    # Euler method update
-    dv = dt*(
-      0.04 * v^2 + 5*v + 140 - u + neuron.I
-      )
-    du = dt*(neuron.a)*(neuron.b*v-u)
-    v += dv
-    u += du
+function update(neuron::Izh, u, t)
+    dv = 1000*(0.04 * u[1]^2 + 5*u[1] + 140 - u[2] + neuron.I)
+    du = 1000*(neuron.a)*(neuron.b*u[1]-u[2])
+    return (dv, du)
+end
 
-    # Check for thresholding
-    if v >= neuron.θ
-        v = neuron.v0
-        u = u + neuron.d
-        output = 1.
+function aff_neuron!(neuron::Izh, u, input, t)
+    u[1] += input;
+end
+
+function event(neuron::Izh, u, t)
+    spike = u[1] > neuron.θ
+    if spike 
+        return (spike, 1)
+    else
+        return (spike, 0)
     end
-
-    return (output, Izh(neuron.a, neuron.b, neuron.c, neuron.d, neuron.I, neuron.θ, neuron.v0, neuron.u0, v, u, output))
 end
 
-"""
-    reset(neuron::Izh)
-
-Resets the state of the Izhikevich neuron to its initial values given by `v0`, `u0`
-"""
-function reset(neuron::Izh)
-    return Izh(
-        neuron.a, neuron.b, neuron.c, neuron.d, neuron.I, neuron.θ, neuron.v0, neuron.u0, neuron.v0, neuron.u0, 0.
-        )
+function reset(neuron::Izh, u)
+    return (neuron.v0, u[2] + neuron.d)
 end
-
-function get_neuron_states(neuron::Izh)
-    return (neuron.v, neuron.u)
-end
+state_size(neuron::Izh) = 2
