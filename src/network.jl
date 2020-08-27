@@ -26,7 +26,7 @@ mutable struct Network<:AbstractNetwork
             conns = Array{Int,1}()
             if isempty(l.conns)
                 push!(conns, i-1)
-                new_layer = Layer(l.neurons, l.W, conns, l.N_neurons, l.input, l.output)
+                new_layer = Layer(l.neurons, l.W, conns, l.N_neurons, l.state_size, l.input, l.output)
             else
                 conns = copy(l.conns)
                 new_layer = deepcopy(l)
@@ -72,6 +72,38 @@ function Network(layers::Array{L, 1}) where L <: AbstractLayer
 
     return Network(layers, N_in)
 end
+
+function update!(net::Network, du::ArrayPartition, u, t)
+    @views @inbounds for j in 1:length(net.layers)
+        update!(net.layers[j], du.x[j], u.x[j], t)
+    end
+end
+
+function event(net::Network, u::ArrayPartition, t)
+    evnt = false
+    @views @inbounds for j in 1:length(net.layers)
+        n_evnt = event(net.layers[j], u.x[j], t)
+        evnt = evnt || n_evnt
+    end
+    return evnt
+end
+
+function aff_net!(net::Network, u::ArrayPartition, t)
+    for j in 1:length(net.layers)
+        net.prev_outputs[j+1] .= net.layers[j].output
+    end
+    for (j,l) in enumerate(net.layers)
+        aff_layer!(l, u.x[j], net.prev_outputs, t)
+    end
+    fill!.(net.prev_outputs, 0)
+end
+
+
+#######################################################################
+#
+# Old stuff to be purged
+#
+#######################################################################
 
 function update!(network::Network, input, dt, t)
     copy!(network.prev_outputs[1], input)
