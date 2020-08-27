@@ -6,6 +6,7 @@ using Distributions
 using LinearAlgebra
 using Parameters
 using Random
+using RecursiveArrayTools
 
 include("types.jl")
 
