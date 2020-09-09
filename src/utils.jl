@@ -8,4 +8,4 @@ include("utilities/pruning.jl")
 include("utilities/poisson.jl")
 
 # Code to handle setting up Diffeq problems and callbacks
-include("utilities/diffeq_handling")
+include("utilities/diffeq_handling.jl")
