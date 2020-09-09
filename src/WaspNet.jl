@@ -8,10 +8,13 @@ using Parameters
 using Random
 using RecursiveArrayTools
 
+using OrdinaryDiffEq
+
 include("types.jl")
 include("defs.jl")
 include("neurons.jl")
 include("layer.jl")
+include("input_layer.jl")
 include("network.jl")
 include("simulate.jl")
 include("utils.jl")
@@ -20,6 +23,8 @@ export WaspnetElement, AbstractNetwork, AbstractNeuron, AbstractLayer
 export Layer, Network, SimulationResult
 export update!, update, simulate!
 export aff_element!, event
+
+export construct_problem
 
 export batch_layer_construction, network_constructor, layer_constructor, feed_forward_network
 
