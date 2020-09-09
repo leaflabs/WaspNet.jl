@@ -87,7 +87,7 @@ function event(net::Network, u, t)
     return any(net.prev_events)
 end
 
-function aff!(net::Network, u, input, t)
+function aff_element!(net::Network, u, input, t)
     @inbounds for (j,l) in enumerate(net.layers)
         aff_layer!(l, u.x[j], net.prev_outputs, t)
     end
