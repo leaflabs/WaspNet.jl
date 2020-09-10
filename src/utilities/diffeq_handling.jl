@@ -14,10 +14,9 @@ function _setup_callbacks(net::Network, args...; kwargs...)
         if isa(l, InputMatrixLayer )
             times = l.times
             function aff_net_times!(int)
-                println("in aff_net_times")
                 net.prev_outputs[i] = @view l.data[:,l.idx]
                 net.prev_events[i] = true
-                net.layers[l] = InputMatrixLayer(l.data, l.times, l.idx+1)
+                net.layers[i] = InputMatrixLayer(l.data, l.times, l.idx+1)
                 aff!(int)
             end
             push!(callbacks, PresetTimeCallback(times, aff_net_times!))
@@ -25,7 +24,7 @@ function _setup_callbacks(net::Network, args...; kwargs...)
     end
     
     event_cond(u, t, int) = event(net, u, t)
-    event_callback = DiscreteCallback(cond, aff!, args...; kwargs...)
+    event_callback = DiscreteCallback(event_cond, aff!, args...; save_positions = (true, true), kwargs...)
     push!(callbacks, event_callback)
     cbset = CallbackSet(callbacks...)
     return cbset
