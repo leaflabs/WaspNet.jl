@@ -16,7 +16,7 @@ mutable struct Network<:AbstractNetwork
     prev_events::Array{Bool, 1}
 
     function Network(layers, N_in, prev_outputs)
-        neurons_per_layer = [length(l.neurons) for l in layers]
+        neurons_per_layer = [num_neurons(l) for l in layers]
         output_sizes = vcat([N_in], neurons_per_layer) # number of signals passed out of each layer incl. input
 
         N_layers = length(layers)
@@ -24,15 +24,19 @@ mutable struct Network<:AbstractNetwork
 
         net_layers = Array{AbstractLayer,1}()
         for (i,l) in enumerate(layers)
-            conns = Array{Int,1}()
-            if isempty(l.conns)
-                push!(conns, i-1)
-                new_layer = Layer(l.neurons, l.W, conns, l.N_neurons, l.state_size, l.input, l.output)
+            if isa(l, Layer)
+                conns = Array{Int,1}()
+                if isempty(l.conns)
+                    push!(conns, i-1)
+                    new_layer = Layer(l.neurons, l.W, conns, l.N_neurons, l.state_size, l.input, l.output)
+                else
+                    conns = copy(l.conns)
+                    new_layer = deepcopy(l)
+                end
+                push!(net_layers, new_layer)
             else
-                conns = copy(l.conns)
-                new_layer = deepcopy(l)
+                push!(net_layers, deepcopy(l))
             end
-            push!(net_layers, new_layer)
         end
 
         return new(net_layers, N_in, prev_outputs, zeros(Bool, N_layers))
@@ -47,8 +51,8 @@ Given an array of `Layer`s and the dimensionality of the input to the network, m
 The output dimensionality is in 
 """ 
 function Network(layers, N_in::Int) 
-    neurons_per_layer = [length(l.neurons) for l in layers]
-    prev_outputs = vcat([zeros(N_in)], [zeros(j) for j in neurons_per_layer])
+    neurons_per_layer = [num_neurons(l) for l in layers]
+    prev_outputs = [zeros(j) for j in neurons_per_layer]
 
     return Network(layers, N_in, prev_outputs)
 end
@@ -89,7 +93,7 @@ end
 
 function aff_element!(net::Network, u, input, t)
     @inbounds for (j,l) in enumerate(net.layers)
-        aff_layer!(l, u.x[j], net.prev_outputs, t)
+        aff_element!(l, u.x[j], net.prev_outputs, t)
     end
     fill!(net.prev_events, false)
 end
