@@ -9,6 +9,7 @@ using Random
 using RecursiveArrayTools
 
 using OrdinaryDiffEq
+using DiffEqCallbacks
 
 include("types.jl")
 include("defs.jl")
