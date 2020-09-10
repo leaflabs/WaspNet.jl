@@ -33,9 +33,14 @@ mutable struct Network<:AbstractNetwork
                     conns = copy(l.conns)
                     new_layer = deepcopy(l)
                 end
+<<<<<<< Updated upstream
                 push!(net_layers, new_layer)
             else
                 push!(net_layers, deepcopy(l))
+=======
+            else
+                new_layer = deepcopy(l)
+>>>>>>> Stashed changes
             end
         end
 
