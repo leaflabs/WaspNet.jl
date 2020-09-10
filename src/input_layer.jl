@@ -21,3 +21,5 @@ end
 function aff_element!(l::InputMatrixLayer, u, input, t)
     return nothing
 end
+
+num_neurons(::InputMatrixLayer) = 0
