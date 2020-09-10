@@ -10,7 +10,6 @@ Contains constituent `Layer`s, orchestrates the movement of signals between `Lay
 """
 mutable struct Network<:AbstractNetwork
     layers::Array{AbstractLayer, 1}
-    N_in::Int
 
     prev_outputs
     prev_events::Array{Bool, 1}
@@ -33,14 +32,9 @@ mutable struct Network<:AbstractNetwork
                     conns = copy(l.conns)
                     new_layer = deepcopy(l)
                 end
-<<<<<<< Updated upstream
                 push!(net_layers, new_layer)
             else
                 push!(net_layers, deepcopy(l))
-=======
-            else
-                new_layer = deepcopy(l)
->>>>>>> Stashed changes
             end
         end
 
@@ -55,7 +49,7 @@ Given an array of `Layer`s and the dimensionality of the input to the network, m
 
 The output dimensionality is in 
 """ 
-function Network(layers, N_in::Int) 
+function Network(layers) 
     neurons_per_layer = [num_neurons(l) for l in layers]
     prev_outputs = [zeros(j) for j in neurons_per_layer]
 
@@ -102,68 +96,3 @@ function aff_element!(net::Network, u, input, t)
     end
     fill!(net.prev_events, false)
 end
-
-
-################################################################################################
-#
-# OLD STUFF WE DON'T USE EXPLICITLY
-#
-################################################################################################
-
-# function update!(net::Network, du::ArrayPartition, u, t)
-#     @views @inbounds for j in 1:length(net.layers)
-#         update!(net.layers[j], du.x[j], u.x[j], t)
-#     end
-# end
-
-# function event(net::Network, u::ArrayPartition, t)
-#     evnt = false
-#     @views @inbounds for j in 1:length(net.layers)
-#         n_evnt = event(net.layers[j], u.x[j], t)
-#         evnt = evnt || n_evnt
-#     end
-#     return evnt
-# end
-
-# function aff_net!(net::Network, u::ArrayPartition, t)
-#     for j in 1:length(net.layers)
-#         net.prev_outputs[j+1] .= net.layers[j].output
-#     end
-#     for (j,l) in enumerate(net.layers)
-#         aff_layer!(l, u.x[j], net.prev_outputs, t)
-#     end
-#     fill!.(net.prev_outputs, 0)
-# end
-
-
-# #######################################################################
-# #
-# # Old stuff to be purged
-# #
-# #######################################################################
-
-# function update!(network::Network, input, dt, t)
-#     copy!(network.prev_outputs[1], input)
-
-#     for i in 1:length(network.layers)
-#         update!(network.layers[i],network.prev_outputs,dt,t)
-#         copy!(network.prev_outputs[i+1], network.layers[i].output)
-#     end
-# end
-
-# function reset!(network::Network)
-#     reset!.(network.layers)
-#     return nothing
-# end
-
-# function get_neuron_count(network::Network)
-#     return sum(map((x)->x.N_neurons, network.layers))
-# end
-
-# function get_neuron_states(network::Network)
-#     return vcat([get_neuron_states(l) for l in network.layers]...)
-# end
-
-# function get_neuron_outputs(network::Network)
-#     return vcat([get_neuron_outputs(l) for l in network.layers]...)
-# end
