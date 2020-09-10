@@ -102,6 +102,24 @@ function aff_element!(l::Layer{L,N,A,M}, u, input, t) where {L,N,A,M<:AbstractAr
     end
 end
 
+function aff_element!(l::Layer{L,N,A,M}, u, input, t) where {L,N,A,M<:AbstractArray{<:AbstractArray,1}}
+    fill!(l.input, 0)
+    for (conn,W) in zip(l.conns, l.W)
+        mul!(l.input, W, input[conn+1], 1, 1)
+    end
+
+    @views @inbounds for j in 1:l.N_neurons
+        idxs = j:l.N_neurons:(l.N_neurons*l.state_size)
+        if l.output[j] != 0
+            u[idxs] .= reset(l.neurons[j], u[idxs])
+        end
+        aff_neuron!(l.neurons[j], u[idxs], l.input[j], t)
+    end
+end
+
+
+num_neurons(l::Layer) = length(l.neurons)
+
 
 
 ################################################################################################
