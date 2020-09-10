@@ -4,11 +4,11 @@ struct InputMatrixLayer{M<:AbstractArray{<:Number, 2}, T<:AbstractArray{<:Number
     idx::Int
 end
 
-function InputMatrixLayer(data, dt, tf)
-    times = 0.:dt:tf
+function InputMatrixLayer(data, times)
     @assert (length(times) == size(data)[2]) "Time duration and length of input data must match"
     return InputMatrixLayer(data, times, 1)
 end
+
 
 function update!(l::InputMatrixLayer, du, u, t)
     return nothing
