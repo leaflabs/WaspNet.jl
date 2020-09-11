@@ -53,7 +53,6 @@ end
 Constructs a `Layer` with constituent `neurons` which accept inputs from the `Layer`s denoted by `conns` (input 1 is the `Network` input) and either a `BlockArray` of weights if `length(conns) > 1` or a Matrix of weights otherwise.
 """
 function Layer(neurons, W, conns = Array{Int, 1}(undef, 0))
-
     N_neurons = length(neurons)
     input = zeros(N_neurons)
     output = zeros(N_neurons)
@@ -74,6 +73,8 @@ end
 
 function event(l::Layer, u, t)
     evnt = false
+    fill!(l.output, 0)
+
     @views @inbounds for j in 1:l.N_neurons
         idxs = j:l.N_neurons:(l.N_neurons*l.state_size)
         (nspike, nval) = event(l.neurons[j], u[idxs], t)
@@ -107,7 +108,6 @@ function aff_element!(l::Layer{L,N,A,M}, u, input, t) where {L,N,A,M<:AbstractAr
     for (conn,W) in zip(l.conns, l.W)
         mul!(l.input, W, input[conn+1], 1, 1)
     end
-
     @views @inbounds for j in 1:l.N_neurons
         idxs = j:l.N_neurons:(l.N_neurons*l.state_size)
         if l.output[j] != 0
@@ -117,9 +117,9 @@ function aff_element!(l::Layer{L,N,A,M}, u, input, t) where {L,N,A,M<:AbstractAr
     end
 end
 
-
 num_neurons(l::Layer) = length(l.neurons)
 
+get_output(l::Layer) = l.output
 
 
 ################################################################################################
