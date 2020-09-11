@@ -14,12 +14,11 @@ function _setup_callbacks(net::Network, args...; kwargs...)
         if isa(l, InputMatrixLayer )
             times = l.times
             function aff_net_times!(int)
-                net.prev_outputs[i] = @view l.data[:,l.idx]
                 net.prev_events[i] = true
-                net.layers[i] = InputMatrixLayer(l.data, l.times, l.idx+1)
                 aff!(int)
+                net.layers[i] = InputMatrixLayer(l.data, l.times, l.idx+1, l.N_neurons)
             end
-            push!(callbacks, PresetTimeCallback(times, aff_net_times!))
+            push!(callbacks, PresetTimeCallback(times, aff_net_times!, save_positions = (true, true)))
         end
     end
     
