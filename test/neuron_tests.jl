@@ -5,12 +5,12 @@
 
         @test begin                         # Adding input to state without time evolution
             (_, lif) = update(lif, 1, 0, 0)
-            lif.state == lif.v0 + 1.
+            lif.state == lif.v0 + lif.R / lif.τ
         end
 
         @test begin                         # Time evolution changes the state
             (_, lif) = update(lif, 0, 0.001, 0)
-            lif.state != lif.v0 + 1
+            lif.state != lif.v0 + lif.R / lif.τ
         end
 
         @test begin                         # Reset works
