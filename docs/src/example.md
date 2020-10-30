@@ -54,6 +54,10 @@ function WaspNet.update(neuron::LIF, input_update, dt, t)
 
     return (output, LIF(neuron.τ, neuron.R, neuron.θ, neuron.I, neuron.v0, state, output))
 end
+
+function WaspNet.reset(neuron::LIF)
+    return LIF(neuron.τ, neuron.R, neuron.θ, neuron.I, neuron.v0, neuron.v0, 0)
+end
 ```
 Now we want to instantiate our `LIF` neuron, update it a few times to see the state of the neuron change
 ```
@@ -61,11 +65,11 @@ neuronLIF = LIF(8., 10.E2, 30., 40., -55., -55., 0.)
 
 println(neuronLIF.state)
 # -55.0
-update!(neuronLIF, 0., 0.001, 0)
+(output, neuronLIF) = update(neuronLIF, 0., 0.001, 0.)
 println(neuronLIF.state)
 # -49.993125
 
-neuronLIF = reset(neuronLIF)
+neuronLIF = reset!(neuronLIF)
 println(neuronLIF.state)
 # -55.0
 ```
