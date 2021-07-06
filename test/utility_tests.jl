@@ -19,4 +19,10 @@
 
     include("pruning_tests.jl")
 
+    @test begin
+        inputs = [1,1]
+        p = poissonST(inputs)
+        spikes = p(1)
+        spikes == [0,0] || spikes == [0,1] || spikes == [1,0] || spikes == [1,1]
+    end
 end
