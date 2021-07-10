@@ -1,3 +1,6 @@
+using BlockArrays
+using WaspNet
+
 @testset "Matrix Layer" begin
     n1 = WaspNet.identity()
     n2 = WaspNet.identity()
@@ -12,17 +15,17 @@
     # Checking initializations are correct
     @test isa(L.W, Matrix)
     @test isempty(L.conns)
-    @test all(L.input .== zeros(2)) 
+    @test all(L.input .== zeros(2))
     @test all(L.output .== zeros(2))
 
     # Inputs are routed correctly
-    @test begin                             
+    @test begin
         update!(L, [[2., 3., 4.]], 0., 0.)
         all(WaspNet.get_neuron_states(L) .== [8., 11.])
     end
 
     # All neurons reset
-    @test begin                             
+    @test begin
         reset!(L)
         all(WaspNet.get_neuron_states(L) .== [0., 0.])
     end
@@ -61,9 +64,9 @@ end
         all(WaspNet.get_neuron_states(layer) .≈ sum.(eachrow(W[Block(1,3)])))
     end
     @test begin
-        update!(layer, [ones(N0), zeros(N1), ones(N2)], 0., 0.) 
+        update!(layer, [ones(N0), zeros(N1), ones(N2)], 0., 0.)
         all(
-            WaspNet.get_neuron_states(layer) .≈ 
+            WaspNet.get_neuron_states(layer) .≈
                 sum.(eachrow(W[Block(1,3)])) .+ sum.(eachrow(W[Block(1,1)]))
             )
     end
@@ -105,9 +108,9 @@ end
         all(WaspNet.get_neuron_states(layer) .≈ sum.(eachrow(W[2])))
     end
     @test begin
-        update!(layer, [ones(N0), zeros(N1), ones(N2)], 0., 0.) 
+        update!(layer, [ones(N0), zeros(N1), ones(N2)], 0., 0.)
         all(
-            WaspNet.get_neuron_states(layer) .≈ 
+            WaspNet.get_neuron_states(layer) .≈
                 sum.(eachrow(W[1])) .+ sum.(eachrow(W[2]))
             )
     end
