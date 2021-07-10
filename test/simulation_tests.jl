@@ -1,3 +1,5 @@
+using WaspNet
+
 @testset "Simulation" begin
     N = 32
     N_in = 16
@@ -17,7 +19,7 @@
     end
 
     # Check neuron output matrix size
-    @test begin                         
+    @test begin
         all(size(results.states) .== [2*N, 1001])
     end
 
@@ -27,17 +29,17 @@
     input_fun(t) = zeros(Float64, N_in)
     results = simulate!(net_hom, input_fun, 0.001, 1.; track_state = true)
     # Check neuron output matrix size
-    @test begin                         
+    @test begin
         all(size(results.outputs) .== [2*N, 1001])
     end
 
     # Check neuron output matrix size
-    @test begin                         
+    @test begin
         all(size(results.states) .== [2*N, 1001])
     end
 
     # Reset the full network
-    @test begin                         
+    @test begin
         reset!(net_hom)
         all(WaspNet.get_neuron_states(net_hom) .== 0.)
     end

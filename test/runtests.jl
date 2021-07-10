@@ -1,12 +1,7 @@
-using WaspNet, BlockArrays, Test
+using Test, SafeTestsets
 
-@testset "WaspNet Tests" begin
-
-    include("neuron_tests.jl")
-    include("layer_tests.jl")
-    include("network_tests.jl")
-    include("simulation_tests.jl")
-    include("utility_tests.jl")
-
-
-end;
+@time @safetestset "Neurons" begin include("neuron_tests.jl") end
+@time @safetestset "Layers" begin include("layer_tests.jl") end
+@time @safetestset "Networks" begin include("network_tests.jl") end
+@time @safetestset "Simulations" begin include("simulation_tests.jl") end
+@time @safetestset "Utils" begin include("utility_tests.jl") end
