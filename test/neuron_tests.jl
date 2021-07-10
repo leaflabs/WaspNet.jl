@@ -1,3 +1,5 @@
+using WaspNet
+
 @testset "Neurons" begin
     @testset "LIF" begin
         lif = WaspNet.LIF()
@@ -67,7 +69,7 @@
 
         @test begin                         # Reset works
             n_tanh = WaspNet.reset(n_tanh)
-            n_tanh.state == 0. 
+            n_tanh.state == 0.
         end
     end
 
@@ -82,7 +84,7 @@
 
         @test begin                         # Reset works
             sigmoid = WaspNet.reset(sigmoid)
-            sigmoid.state == 0. 
+            sigmoid.state == 0.
         end
     end
 

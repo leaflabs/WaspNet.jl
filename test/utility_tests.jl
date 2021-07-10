@@ -1,3 +1,5 @@
+using WaspNet
+
 @testset "Utility Functions" begin
     @test begin                             # All neurons in layer initialized correctly
         v0 = WaspNet.LIF().state[1]

@@ -1,6 +1,8 @@
-@testset "Pruning" begin 
+using BlockArrays
 
-    @testset "delete_entries" begin 
+@testset "Pruning" begin
+
+    @testset "delete_entries" begin
         # Block Array tests
 
         ba = BlockArray(reshape(collect(1:25), (5,5)), [2, 2, 1], [2, 3])
@@ -66,7 +68,7 @@
         prune_neurons = [[2,4], [1], [2]]
         L2 = WaspNet.prune(L, layers, prune_neurons, l_idx)
         @test begin
-            length(L2.neurons) == 3    
+            length(L2.neurons) == 3
         end
         @test begin
             all(size(L2.W) .== (3,3))
@@ -99,11 +101,11 @@
         prune_layers = [1,2]
         prune_neurons = [[3], [2, 4]]
         pruned = WaspNet.prune(net, prune_layers, prune_neurons)
-        
+
         @test begin
             all(size(pruned.layers[1].W) .== (4,12)) && all(size(pruned.layers[2].W) .== (4,12))
         end
-        @test begin 
+        @test begin
             all(pruned.layers[1].W .== W1[[1,2,4,5],[collect(1:6)..., 8,9,10,12,14,15]]) &&
                 all(pruned.layers[2].W .== W2[[1,3,5,6],[collect(1:6)..., 8,9,10,12,14,15]])
         end
