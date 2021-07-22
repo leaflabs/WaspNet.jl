@@ -9,6 +9,11 @@ timestep of simulation.
 - `l`: array of values
 """
 
-function poissonST(l::AbstractVector)
-    return poissonST(t) = [Float64(rand(Bernoulli(p), 1)[1]) for p in normalize(l)]
+function getPoissonST_old(l::AbstractVector)
+    return (_) -> rand.(Bernoulli.(normalize(l)))
+end
+
+function getPoissonST(l::AbstractVector, d)
+    norm = normalize(l)
+    return (_)->rand.(d.(norm))
 end
