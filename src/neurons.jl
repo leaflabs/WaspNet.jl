@@ -1,6 +1,7 @@
 include("neurons/LIF.jl")
 include("neurons/Izh.jl")
 include("neurons/functional_neurons.jl")
+include("neurons/InhibNeuron.jl")
 
 function get_neuron_outputs(n::AbstractNeuron)
     return n.output
