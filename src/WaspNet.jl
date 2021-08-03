@@ -23,6 +23,6 @@ export update
 
 export batch_layer_construction, network_constructor, layer_constructor, feed_forward_network
 
-export getPoissonST, getPoissonST_old
+export getPoissonST
 
 end # module

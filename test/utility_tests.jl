@@ -1,4 +1,5 @@
 using WaspNet
+using Distributions
 
 @testset "Utility Functions" begin
     @test begin                             # All neurons in layer initialized correctly
@@ -23,14 +24,14 @@ using WaspNet
 
     @test begin
         inputs = [1,1]
-        p = getPoissonST_old(inputs)
+        p = getPoissonST(inputs, Bernoulli)
         spikes = p(1)
         spikes == [0,0] || spikes == [0,1] || spikes == [1,0] || spikes == [1,1]
     end
 
     @test begin
         inputs = [0,0,1]
-        p = getPoissonST_old(inputs)
+        p = getPoissonST(inputs, Bernoulli)
         spikes = p(1)
         spikes == [0,0,1]
     end
