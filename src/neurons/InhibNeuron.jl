@@ -9,7 +9,7 @@ function update(neuron::InhibNeuron, input_update, dt, t)
 end
 
 function get_neuron_outputs(n::InhibNeuron)
-    return get_neuron_outputs(-1.0*n.inner_neuron)
+    return -1*get_neuron_outputs(n.inner_neuron)
 end
 
 function get_neuron_states(n::InhibNeuron)
