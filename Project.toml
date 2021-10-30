@@ -1,7 +1,7 @@
 name = "WaspNet"
 uuid = "c0b53cd3-4946-4106-b8e7-91971464ade9"
 authors = ["Sam Buercklin <buercklin@leaflabs.com>", "Charles Freeman <cfreeman@leaflabs.com>"]
-version = "0.1.3"
+version = "0.1.4"
 
 [deps]
 BlockArrays = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
